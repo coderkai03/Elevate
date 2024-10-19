@@ -9,6 +9,7 @@ import { cn } from "@/utils";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AssistantMessage } from "hume/api/resources/empathicVoice/types/AssistantMessage";
 import { UserMessage } from "hume/api/resources/empathicVoice/types/UserMessage";
+import { createCase } from "@/app/test/actions/caseActions";
 
 export default function Controls({
   loggedMessages,
@@ -18,6 +19,76 @@ export default function Controls({
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
 
   const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY ?? '');
+
+  const parseMessages = async (messages: (JSONMessage | ConnectionMessage)[]) => {
+    // ask gemini to summarize the conversation
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const conversation = messages
+      .filter((msg): msg is (JSONMessage | ConnectionMessage) =>
+        (msg?.type === "user_message" ||
+        msg?.type === "assistant_message") &&
+        "message" in msg &&
+        msg.message?.content !== undefined
+      )
+      .map((msg) => {
+        if (
+          (msg?.type === "assistant_message" ||
+            msg?.type === "user_message") &&
+          "message" in msg &&
+          msg.message.content
+        ) {
+          return msg.message.content;
+        }
+        return '';
+      })
+      .join("\n");
+    console.log(conversation);
+
+    const response = await model.generateContent(
+      `This is a conversation between a homeless person and a case worker: ${conversation}.
+      Please generate a recap of the conversation and map of (up to 5) tasks that the case worker can
+      help the homeless person using the following JSON format. Do not include any other special characters:
+      {
+        "name": "Name of the homeless person",
+        "age": "Age of the homeless person",
+        "gender": "Gender of the homeless person",
+        "location": "Location of the homeless person",
+        "profile_description": "Description of the homeless person",
+        "tasks": [
+          {
+            "id": Math.floor(Math.random() * 1000000),
+            "case_id": 0,
+            "name": "Name of the task",
+            "description": "Description of the task",
+            "completed": false,
+            "createdAt": "YYYY-MM-DDTHH:mm:ss.sssZ",
+            "updatedAt": "YYYY-MM-DDTHH:mm:ss.sssZ"
+          },
+        ]
+      }`,
+    );
+
+    handleCreateNewCase(response.response.text());
+    console.log(response.response.text());
+  }
+
+  const handleCreateNewCase = async (response: string) => {
+    const demographics = JSON.parse(response);
+    const newCase = await createCase({
+      ...demographics,
+      image_link: null,
+      donation_amount: 0,
+    });
+
+    console.log(newCase);
+    
+    if (newCase.success) {
+      console.log(`New case created successfully! Case ID: ${newCase.caseId}`);
+      // fetchCasesAndTasks(); // Refresh the list after creating a new case
+    } else {
+      console.log(newCase.error || "Error creating new case. Please try again.");
+    }
+  }
 
   return (
     <div
@@ -72,34 +143,7 @@ export default function Controls({
               className={"flex items-center gap-1"}
               onClick={async () => {
                 disconnect();
-                // ask gemini to summarize the conversation
-                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-                const conversation = loggedMessages
-                  .filter((msg): msg is (JSONMessage | ConnectionMessage) =>
-                    (msg?.type === "user_message" ||
-                    msg?.type === "assistant_message") &&
-                    "message" in msg &&
-                    msg.message?.content !== undefined
-                  )
-                  .map((msg) => {
-                    if (
-                      (msg?.type === "assistant_message" ||
-                        msg?.type === "user_message") &&
-                      "message" in msg &&
-                      msg.message.content
-                    ) {
-                      return msg.message.content;
-                    }
-                    return '';
-                  })
-                  .join("\n");
-                console.log(conversation);
-
-                const response = await model.generateContent(
-                  `This is a conversation between a homeless person and a case worker: ${conversation}.
-                  Please summarize the homeless person's story in a few sentences.`,
-                );
-                console.log(response.response.text());
+                parseMessages(loggedMessages);
               }}
               variant={"destructive"}
             >
