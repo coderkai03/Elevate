@@ -10,12 +10,11 @@ const profiles = [
     { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
     { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
     { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-]
+    ]
 
-export default function Dashboard() {
+    export default function Dashboard() {
     return (
-        <div className="flex flex-col h-screen">
-        {/* Header, Search, and Filter */}
+        <div>
         <h2 className="text-4xl font-bold text-[#9687EC] mb-6">Profiles</h2>
         <div className="flex justify-between mb-6">
             <div className="relative flex-1 mr-4">
@@ -31,14 +30,10 @@ export default function Dashboard() {
             <ChevronDown size={20} />
             </button>
         </div>
-
-        {/* Scrollable Profile Cards */}
-        <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {profiles.map((profile, index) => (
-                <ProfileCard key={index} {...profile} />
+            <ProfileCard key={index} {...profile} />
             ))}
-            </div>
         </div>
         </div>
     )

@@ -1,15 +1,30 @@
 "use client";
 import { cn } from "@/utils";
-import { useVoice } from "@humeai/voice-react";
+import { ConnectionMessage, JSONMessage, useVoice } from "@humeai/voice-react";
 import Expressions from "./Expressions";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, forwardRef } from "react";
+import { ComponentRef, forwardRef, useEffect, useState } from "react";
 
 const Messages = forwardRef<
   ComponentRef<typeof motion.div>,
-  Record<never, never>
->(function Messages(_, ref) {
+  { setLoggedMessages: (message: (JSONMessage | ConnectionMessage)[]) => void }
+>(function Messages({ setLoggedMessages }, ref) {
   const { messages } = useVoice();
+
+  useEffect(() => {
+    if (messages.length === 0) return;
+    
+    const lastMessage = messages[messages.length - 1];
+    if (
+      (lastMessage?.type === "assistant_message" ||
+        lastMessage?.type === "user_message") &&
+      "message" in lastMessage &&
+      lastMessage.message.content
+    ) {
+      setLoggedMessages([...messages, lastMessage]);
+      console.log(lastMessage.message.content);
+    }
+  }, [messages]);
 
   return (
     <motion.div
@@ -68,5 +83,13 @@ const Messages = forwardRef<
     </motion.div>
   );
 });
+
+//function that logs the messages to the console
+function logMessages(message: string | undefined) {
+  if (message) {
+    console.log(message);
+  }
+  return message;
+}
 
 export default Messages;

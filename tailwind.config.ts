@@ -1,4 +1,3 @@
-import type { Config } from "tailwindcss"
 import defaultTheme from 'tailwindcss/defaultTheme'
 
 const config = {
@@ -8,12 +7,12 @@ const config = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     fontFamily: {
-      'sans': ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
-      'mono': ['var(--font-geist-mono)', ...defaultTheme.fontFamily.mono],
+      sans: ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
+      mono: ['var(--font-geist-mono)', ...defaultTheme.fontFamily.mono],
     },
     container: {
       center: true,
@@ -80,6 +79,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+}
 
 export default config

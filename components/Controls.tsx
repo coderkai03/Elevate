@@ -1,14 +1,23 @@
 "use client";
-import { useVoice } from "@humeai/voice-react";
+import { ConnectionMessage, JSONMessage, useVoice } from "@humeai/voice-react";
 import { Button } from "./ui/button";
 import { Mic, MicOff, Phone } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toggle } from "./ui/toggle";
 import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { AssistantMessage } from "hume/api/resources/empathicVoice/types/AssistantMessage";
+import { UserMessage } from "hume/api/resources/empathicVoice/types/UserMessage";
 
-export default function Controls() {
+export default function Controls({
+  loggedMessages,
+}: {
+  loggedMessages: (JSONMessage | ConnectionMessage)[];
+}) {
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
+
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY ?? '');
 
   return (
     <div
@@ -61,8 +70,36 @@ export default function Controls() {
 
             <Button
               className={"flex items-center gap-1"}
-              onClick={() => {
+              onClick={async () => {
                 disconnect();
+                // ask gemini to summarize the conversation
+                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+                const conversation = loggedMessages
+                  .filter((msg): msg is (JSONMessage | ConnectionMessage) =>
+                    (msg?.type === "user_message" ||
+                    msg?.type === "assistant_message") &&
+                    "message" in msg &&
+                    msg.message?.content !== undefined
+                  )
+                  .map((msg) => {
+                    if (
+                      (msg?.type === "assistant_message" ||
+                        msg?.type === "user_message") &&
+                      "message" in msg &&
+                      msg.message.content
+                    ) {
+                      return msg.message.content;
+                    }
+                    return '';
+                  })
+                  .join("\n");
+                console.log(conversation);
+
+                const response = await model.generateContent(
+                  `This is a conversation between a homeless person and a case worker: ${conversation}.
+                  Please summarize the homeless person's story in a few sentences.`,
+                );
+                console.log(response.response.text());
               }}
               variant={"destructive"}
             >
