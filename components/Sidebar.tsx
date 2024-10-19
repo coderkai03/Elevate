@@ -20,13 +20,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
     return (
-        <aside
-        className="relative w-64 p-6 shadow-lg h-screen"
-        style={{
-            background:
-            'linear-gradient(to top, rgba(150, 135, 236, 0.5), white)',
-        }}
-        >
+        <aside className="relative w-64 p-6 shadow-lg h-screen" >
         <div className="flex items-center mb-8">
             <Image
             src={logo}

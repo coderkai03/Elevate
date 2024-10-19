@@ -1,68 +1,45 @@
-"use client"
+import { Search, ChevronDown } from 'lucide-react'
+import ProfileCard from './ProfileCard'
 
-import { useState, useEffect } from 'react'
-import { Mic } from 'lucide-react'
+const profiles = [
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'In Progress' as 'In Progress', progress: 78.6, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'In Progress' as 'In Progress', progress: 78.6, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
+]
 
-const AnimatedWaveform = () => {
-  const [isAnimating, setIsAnimating] = useState(false)
+export default function Dashboard() {
+    return (
+        <div className="flex flex-col h-screen">
+        {/* Header, Search, and Filter */}
+        <h2 className="text-4xl font-bold text-[#9687EC] mb-6">Profiles</h2>
+        <div className="flex justify-between mb-6">
+            <div className="relative flex-1 mr-4">
+            <input
+                type="text"
+                placeholder="Search by name, category"
+                className="w-full pl-10 pr-4 py-2 rounded-md bg-purple-100 focus:outline-none focus:ring-2 focus:ring-[#9687EC]"
+            />
+            <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+            </div>
+            <button className="flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-md">
+            <span>Filter by category</span>
+            <ChevronDown size={20} />
+            </button>
+        </div>
 
-  useEffect(() => {
-    if (isAnimating) {
-      const timer = setTimeout(() => setIsAnimating(false), 5000) // Stop after 5 seconds
-      return () => clearTimeout(timer)
-    }
-  }, [isAnimating])
-
-  const generateRandomPoints = () => {
-    const points = []
-    for (let i = 0; i < 100; i++) {
-      points.push(Math.random() * 50)
-    }
-    return points.join(' ')
-  }
-
-  return (
-    <svg className="w-full h-32" viewBox="0 0 1000 100" preserveAspectRatio="none">
-      <polyline
-        points={generateRandomPoints()}
-        fill="none"
-        stroke="url(#gradient)"
-        strokeWidth="3"
-        className={isAnimating ? "animate-wave" : ""}
-      />
-      <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#3B82F6" />
-        </linearGradient>
-      </defs>
-    </svg>
-  )
-}
-
-export default function NewCase() {
-  const [isRecording, setIsRecording] = useState(false)
-
-  const handleMicClick = () => {
-    setIsRecording(!isRecording)
-  }
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <h1 className="text-4xl font-bold mb-12">
-        What is <span className="text-gray-400">your story?</span>
-      </h1>
-      <div className="w-full max-w-3xl mb-12">
-        <AnimatedWaveform />
-      </div>
-      <button
-        onClick={handleMicClick}
-        className={`rounded-full p-6 transition-colors duration-300 ${
-          isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'
-        }`}
-      >
-        <Mic className="w-8 h-8 text-white" />
-      </button>
-    </div>
-  )
+        {/* Scrollable Profile Cards */}
+        <div className="flex-1 overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {profiles.map((profile, index) => (
+                <ProfileCard key={index} {...profile} />
+            ))}
+            </div>
+        </div>
+        </div>
+    )
 }
