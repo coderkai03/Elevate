@@ -1,10 +1,10 @@
 "use client";
 
-import { VoiceProvider } from "@humeai/voice-react";
+import { ConnectionMessage, JSONMessage, VoiceProvider } from "@humeai/voice-react";
 import Messages from "./Messages";
 import Controls from "./Controls";
 import StartCall from "./StartCall";
-import { ComponentRef, useRef } from "react";
+import { ComponentRef, useRef, useState } from "react";
 
 export default function ClientComponent({
   accessToken,
@@ -13,6 +13,10 @@ export default function ClientComponent({
 }) {
   const timeout = useRef<number | null>(null);
   const ref = useRef<ComponentRef<typeof Messages> | null>(null);
+
+  const [loggedMessages, setLoggedMessages] = useState<
+    (JSONMessage | ConnectionMessage)[]
+  >([]);
 
   // optional: use configId from environment variable
   const configId = process.env['NEXT_PUBLIC_HUME_CONFIG_ID'];
@@ -43,8 +47,8 @@ export default function ClientComponent({
           }, 200);
         }}
       >
-        <Messages ref={ref} />
-        <Controls />
+        <Messages ref={ref} setLoggedMessages={setLoggedMessages} />
+        <Controls loggedMessages={loggedMessages} />
         <StartCall />
       </VoiceProvider>
     </div>
