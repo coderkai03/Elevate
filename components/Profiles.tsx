@@ -210,7 +210,7 @@ export default function Dashboard() {
                 placeholder="Search by name, category"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-md bg-[#BDB3F2]-100 focus:outline-none focus:ring-2 focus:ring-[#9687EC]"
+                className="w-full pl-10 pr-4 py-2 rounded-md bg-[#BDB3F2]-100 focus:outline-none focus:ring-2 focus:ring-[#9687EC] shadow-md hover:shadow-lg transition-shadow"
             />
             <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
             </div>

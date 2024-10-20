@@ -18,7 +18,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
-    // Automatically set "Profiles" as the default active link when the sidebar loads
     useEffect(() => {
         if (!activeLink) {
             setActiveLink('Profiles');
@@ -26,7 +25,12 @@ export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
     }, [activeLink, setActiveLink]);
 
     return (
-        <aside className="relative w-64 p-6 shadow-lg h-screen">
+        <aside
+            className="relative w-64 p-6 shadow-lg h-screen"
+            style={{
+                background: 'linear-gradient(to top, rgba(233, 135, 236, 0.3), rgba(150, 135, 236, 0.5), rgba(217, 217, 217, 0.2))',
+            }}
+        >
             <div className="flex items-center mb-8">
                 <Link href="/">
                     <Image
@@ -50,6 +54,7 @@ export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
                     activeLink={activeLink}
                     setActiveLink={setActiveLink}
                 />
+                {/* Uncomment this line if you want to add Task Manager */}
                 {/* <NavItem
                     label="Task Manager"
                     icon={<ClipboardList size={20} />}
@@ -105,14 +110,13 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                     isActive && !isSpecial ? 'bg-gradient-to-r from-[#4984EE] to-[#9747FF]' : ''
                 }`}
             >
-                {/* Inner container for the gradient and fill effect */}
                 <div
                     onClick={() => {
                         setActiveLink(label);
                     }}
                     className={`flex items-center space-x-2 p-2 rounded-md w-full text-left ${
                         isActive && !isSpecial
-                            ? 'bg-[#F7F7F7] text-[#9687EC]' // Background is now #F7F7F7 for active link
+                            ? 'bg-[#F7F7F7] text-[#9687EC]' 
                             : 'text-gray-600 hover:text-purple-900'
                     } cursor-pointer`}
                 >

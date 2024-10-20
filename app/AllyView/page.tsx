@@ -59,10 +59,10 @@ export default function MainLayout() {
 
             <div
                 className="flex-1 p-6 overflow-y-auto"
-                style={{
-                    background:
-                        'linear-gradient(to top, rgba(233, 135, 236, 0.3), rgba(150, 135, 236, 0.5), rgba(217, 217, 217, 0.2))',
-                }}
+                // style={{
+                //     background:
+                //         'linear-gradient(to top, rgba(233, 135, 236, 0.3), rgba(150, 135, 236, 0.5), rgba(217, 217, 217, 0.2))',
+                // }}
             >
                 {renderContent()}
             </div>
