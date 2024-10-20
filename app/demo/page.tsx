@@ -4,9 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/SidebarDemo';
 import Dashboard from '@/components/Dashboard';
-import Profiles from '@/components/Profiles';
-import TaskManager from '@/components/TaskManager';
-import NewCase from '@/components/NewCase';
 
 export default function MainLayout() {
     const [activeLink, setActiveLink] = useState('Dashboard');
