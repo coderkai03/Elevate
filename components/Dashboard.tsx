@@ -1,45 +1,48 @@
-import { Search, ChevronDown } from 'lucide-react'
-import ProfileCard from './ProfileCard'
-
-const profiles = [
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'In Progress' as 'In Progress', progress: 78.6, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'In Progress' as 'In Progress', progress: 78.6, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-    { name: 'Name', title: 'title', amount: 1000.22, joinDate: 'December 2021', status: 'Completed' as 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80' },
-]
-
-export default function Dashboard() {
-    return (
-        <div className="flex flex-col h-screen">
-        {/* Header, Search, and Filter */}
-        <h2 className="text-4xl font-bold text-[#9687EC] mb-6">Profiles</h2>
-        <div className="flex justify-between mb-6">
-            <div className="relative flex-1 mr-4">
-            <input
-                type="text"
-                placeholder="Search by name, category"
-                className="w-full pl-10 pr-4 py-2 rounded-md bg-purple-100 focus:outline-none focus:ring-2 focus:ring-[#9687EC]"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-            </div>
-            <button className="flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-md">
-            <span>Filter by category</span>
-            <ChevronDown size={20} />
-            </button>
-        </div>
-
-        {/* Scrollable Profile Cards */}
-        <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {profiles.map((profile, index) => (
-                <ProfileCard key={index} {...profile} />
-            ))}
-            </div>
-        </div>
-        </div>
-    )
-}
+// function initMap() {
+//     const map = new google.maps.Map(document.getElementById("map"), {
+//       center: { lat: -33.866, lng: 151.196 },
+//       zoom: 15,
+//     });
+//     const request = {
+//       placeId: "ChIJN1t_tDeuEmsRUsoyG83frY4",
+//       fields: ["name", "formatted_address", "place_id", "geometry"],
+//     };
+//     const infowindow = new google.maps.InfoWindow();
+//     const service = new google.maps.places.PlacesService(map);
+  
+//     service.getDetails(request, (place, status) => {
+//       if (
+//         status === google.maps.places.PlacesServiceStatus.OK &&
+//         place &&
+//         place.geometry &&
+//         place.geometry.location
+//       ) {
+//         const marker = new google.maps.Marker({
+//           map,
+//           position: place.geometry.location,
+//         });
+  
+//         google.maps.event.addListener(marker, "click", () => {
+//           const content = document.createElement("div");
+//           const nameElement = document.createElement("h2");
+  
+//           nameElement.textContent = place.name;
+//           content.appendChild(nameElement);
+  
+//           const placeIdElement = document.createElement("p");
+  
+//           placeIdElement.textContent = place.place_id;
+//           content.appendChild(placeIdElement);
+  
+//           const placeAddressElement = document.createElement("p");
+  
+//           placeAddressElement.textContent = place.formatted_address;
+//           content.appendChild(placeAddressElement);
+//           infowindow.setContent(content);
+//           infowindow.open(map, marker);
+//         });
+//       }
+//     });
+//   }
+  
+//   window.initMap = initMap;

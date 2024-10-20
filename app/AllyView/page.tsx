@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/SidebarDemo';
+import { useRouter } from 'next/navigation'; // Correct import for Next.js navigation
+import Sidebar from '@/components/SidebarAlly';
 import Dashboard from '@/components/Dashboard';
 import Profiles from '@/components/Profiles';
 import TaskManager from '@/components/TaskManager';
@@ -19,12 +19,16 @@ export default function MainLayout() {
 
     const renderContent = () => {
         switch (activeLink) {
-            case 'Dashboard':
-                return <Dashboard />;
+            case 'Profiles':
+                return <Profiles />;
+            case 'Task Manager':
+                return <TaskManager />;
+            case 'New Case':
+                return <NewCase />;
             case 'LogOut':
                 return null;
             default:
-                return <Dashboard />;
+                return <Profiles />;
         }
     };
 

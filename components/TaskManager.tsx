@@ -1,68 +1,97 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Mic } from 'lucide-react'
+import { useState } from 'react'
+import { Home, Users, ClipboardList, PlusCircle, Settings, LogOut, Filter, MoreVertical } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 
-const AnimatedWaveform = () => {
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    if (isAnimating) {
-      const timer = setTimeout(() => setIsAnimating(false), 5000) // Stop after 5 seconds
-      return () => clearTimeout(timer)
-    }
-  }, [isAnimating])
-
-  const generateRandomPoints = () => {
-    const points = []
-    for (let i = 0; i < 100; i++) {
-      points.push(Math.random() * 50)
-    }
-    return points.join(' ')
-  }
-
-  return (
-    <svg className="w-full h-32" viewBox="0 0 1000 100" preserveAspectRatio="none">
-      <polyline
-        points={generateRandomPoints()}
-        fill="none"
-        stroke="url(#gradient)"
-        strokeWidth="3"
-        className={isAnimating ? "animate-wave" : ""}
-      />
-      <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#3B82F6" />
-        </linearGradient>
-      </defs>
-    </svg>
-  )
+// Task card component
+interface TaskCardProps {
+    name: string;
+    description: string;
 }
 
-export default function NewCase() {
-  const [isRecording, setIsRecording] = useState(false)
-
-  const handleMicClick = () => {
-    setIsRecording(!isRecording)
-  }
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <h1 className="text-4xl font-bold mb-12">
-        What is <span className="text-gray-400">your story?</span>
-      </h1>
-      <div className="w-full max-w-3xl mb-12">
-        <AnimatedWaveform />
-      </div>
-      <button
-        onClick={handleMicClick}
-        className={`rounded-full p-6 transition-colors duration-300 ${
-          isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-500 hover:bg-purple-600'
-        }`}
-      >
-        <Mic className="w-8 h-8 text-white" />
-      </button>
+const TaskCard = ({ name, description }: TaskCardProps) => (
+    <div className="bg-purple-200 rounded-md p-4 mb-4">
+        <div className="flex items-center mb-2">
+        <Image src="/placeholder.svg?height=32&width=32" width={32} height={32} alt={name} className="rounded-full mr-2" />
+        <span className="font-semibold">{name}</span>
+        </div>
+        <p className="text-sm text-gray-600">{description}</p>
     </div>
-  )
+)
+
+// Task column component
+interface Task {
+    name: string;
+    description: string;
+}
+
+interface TaskColumnProps {
+    title: string;
+    tasks: Task[];
+}
+
+const TaskColumn = ({ title, tasks }: TaskColumnProps) => (
+    <div className="bg-gray-100 rounded-md p-4 w-1/4">
+        <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold">{title}</h3>
+        <div className="flex space-x-2">
+            <button className="text-gray-600 hover:text-purple-600">
+            <PlusCircle size={20} />
+            </button>
+            <button className="text-gray-600 hover:text-purple-600">
+            <MoreVertical size={20} />
+            </button>
+        </div>
+        </div>
+        {tasks.map((task, index) => (
+        <TaskCard key={index} {...task} />
+        ))}
+    </div>
+)
+
+// Main component
+export default function TaskManager() {
+    const [tasks, setTasks] = useState({
+        todo: [
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
+        ],
+        inProgress: [
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
+        ],
+        waiting: [
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' },
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
+        ],
+        done: [
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' },
+        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
+        ]
+    })
+
+    return (
+        <div className="flex h-screen">
+        <main className="flex-1 overflow-auto">
+            <div className="flex justify-between items-center mb-8">
+            <h2 className="text-4xl font-bold text-purple-600">Task Manager</h2>
+            <div className="flex items-center space-x-4">
+                <button className="px-4 py-2 border border-gray-300 rounded-md flex items-center space-x-2 hover:bg-gray-100">
+                <Filter size={20} />
+                <span>Filters</span>
+                </button>
+                <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                + Create Task
+                </button>
+            </div>
+            </div>
+            <div className="flex space-x-4">
+            <TaskColumn title="TO DO" tasks={tasks.todo} />
+            <TaskColumn title="IN PROGRESS" tasks={tasks.inProgress} />
+            <TaskColumn title="WAITING" tasks={tasks.waiting} />
+            <TaskColumn title="DONE" tasks={tasks.done} />
+            </div>
+        </main>
+        </div>
+    )
 }

@@ -48,7 +48,7 @@ export default function Home() {
         </header>
 
             <main className="mx-auto h-full flex flex-col md:flex-row items-center px-0 pl-11">
-                <div className="md:w-1/2 mb-8 md:mb-0 mt-[-80px]">
+                <div className="md:w-1/2 mb-8 md:mb-0 mt-[-100px]">
                     <h1 className="text-6xl md:text-6xl font-bold mb-4">
                         <span className="text-[#9687EC]">Empowering</span>
                         <br />
@@ -69,6 +69,11 @@ export default function Home() {
                             Start now 
                             <span className="ml-2">›</span>
                         </button>
+                    </div>
+                    <div className="pt-4">
+                        <Link href="/AllyView">
+                            <p className="text-black hover:text-[#9687EC]">Sign in as Ally</p>
+                        </Link>
                     </div>
                 </div>
 
