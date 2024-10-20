@@ -1,21 +1,36 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for Next.js navigation
 import Sidebar from '@/components/SidebarAlly';
-import Dashboard from '@/components/Dashboard';
 import Profiles from '@/components/Profiles';
 import TaskManager from '@/components/TaskManager';
-// import NewCase from '@/components/NewCase';
 import dynamic from 'next/dynamic';
-// import NewCase from '@/components/NewCase';
-const HumeChatComponent = dynamic(() => import('@/components/HumeChatComponent'), {
-    ssr: false,
-});
+import Chat from '@/components/Chat';
 
 export default function MainLayout() {
     const [activeLink, setActiveLink] = useState('Dashboard');
+    const [accessToken, setAccessToken] = useState<string>("");
     const router = useRouter(); 
+
+    useEffect(() => {
+        const fetchAccessToken = async () => {
+            try {
+                const response = await fetch('/api/hume-token');
+                const data = await response.json();
+                if (response.ok) {
+                    setAccessToken(data.accessToken);
+                } else {
+                    console.error('Failed to fetch Hume access token:', data.error);
+                }
+            } catch (error) {
+                console.error('Error fetching Hume access token:', error);
+            }
+        };
+
+        fetchAccessToken();
+    }, []);
 
     const handleLogOut = () => {
         setActiveLink('LogOut');
@@ -29,7 +44,7 @@ export default function MainLayout() {
             case 'Task Manager':
                 return <TaskManager />;
             case 'New Case':
-                return <HumeChatComponent />;
+                return accessToken ? <Chat accessToken={accessToken} /> : null;
             case 'LogOut':
                 return null;
             default:
