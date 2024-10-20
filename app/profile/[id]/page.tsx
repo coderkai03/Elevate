@@ -5,10 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Sidebar from '@/components/SidebarAlly';
 import { fetchUserData } from '@/app/test/page'
+import { useParams } from 'next/navigation';
+import { profiles } from '@/components/Profiles';
 
-interface ProfileOverviewProps {
-    id: string;
-}
 
 // Progress bar component
 interface ProgressBarProps {
@@ -40,27 +39,27 @@ interface Profile {
 }
 
 // Main component
-export default function ProfileOverview({ id }: { id: string }) {
+export default function ProfileOverview() {
+    const { id } = useParams();
     const [profile, setProfile] = useState<Profile | null>(null)
     const [overallProgress, setOverallProgress] = useState(75)
     const [donationProgress, setDonationProgress] = useState(60)
-
     useEffect(() => {
-        async function fetchProfile() {
-            const users = await fetchUserData()
-            if (users.casesResult && users.casesResult.cases) {
-                const user = users.casesResult.cases.find((c: any) => c.name === id)
-                setProfile({
-                    name: user.name,
-                    gender: user.gender,
-                    age: user.age,
-                    about: user.about
-                })
-            }
+        console.log(id)
+        const selectedProfile = profiles[parseInt(id as string)-1];
+        if (selectedProfile) {
+            setProfile({
+                name: selectedProfile.name,
+                gender: selectedProfile.gender || '',
+                age: selectedProfile.age,
+                about: selectedProfile.about || ''
+            });
         }
-        fetchProfile()
-        console.log(profile)
-    }, []);
+    }, [id]);
+
+    if (!profile) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="flex h-screen bg-purple-50">
