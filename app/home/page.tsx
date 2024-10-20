@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import bg from "@/public/pic/background1.png";
-import element from "@/public/pic/element.png";
+import element from "@/public/pic/element2.png";
 import logo from "@/public/pic/logo.png";
 
 export default function Home() {
@@ -75,7 +75,7 @@ export default function Home() {
                 </div>
 
                 <div className="md:w-1/2 flex justify-end items-center h-full mt-[-100px]">
-                    <Image src={element} alt="element" className="rounded-md object-contain align-right" />
+                    <Image src={element} alt="element2" className="rounded-md object-contain align-right" />
                 </div>
             </main>
         </div>
