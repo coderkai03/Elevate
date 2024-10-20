@@ -46,7 +46,6 @@ export const expressionLabels: Record<string, string> = {
   sadness: "Sadness",
   sarcasm: "Sarcasm",
   satisfaction: "Satisfaction",
-  sexualDesire: "Sexual Desire",
   shame: "Shame",
   surprise: "Surprise",
   surpriseNegative: "Surprise (Negative)",
@@ -104,7 +103,6 @@ export const expressionEmojis: Record<string, string> = {
   sadness: "😢",
   sarcasm: "😏",
   satisfaction: "😌",
-  sexualDesire: "😘",
   shame: "🫣",
   surprise: "😮",
   surpriseNegative: "😮",
@@ -151,10 +149,10 @@ export const categorizedExpressions: Record<string, string[]> = {
     "Surprise (Positive)",
     "Surprise (Negative)",
   ],
-  drive: [
+  motivation: [
     "Determination",
     "Craving",
-    "Sexual Desire",
+    "Curiosity",
     "Entrancement",
     "Realization",
     "Relief",

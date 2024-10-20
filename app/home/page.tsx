@@ -74,8 +74,8 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className="md:w-1/2 flex justify-end items-center h-full mt-[-100px]">
-                    <Image src="/pic/element2.png" alt="element2" className="rounded-md object-contain align-right" />
+                <div className="md:w-1 flex justify-end items-center h-screen mt-[-100px]">
+                    <Image src="/pic/element2.png" alt="element2" className="object-cover align-right h-full" />
                 </div>
             </main>
         </div>
