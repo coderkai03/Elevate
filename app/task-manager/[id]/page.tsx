@@ -5,18 +5,20 @@ import { Home, Users, ClipboardList, PlusCircle, Settings, LogOut, Filter, MoreV
 import Link from 'next/link'
 import Image from 'next/image'
 import Sidebar from '@/components/SidebarAlly'
+import { useParams } from 'next/navigation'
+import { profiles } from '@/components/Profiles'
 
 // Task card component
 interface TaskCardProps {
-    name: string;
+    title: string;
     description: string;
 }
 
-const TaskCard = ({ name, description }: TaskCardProps) => (
+const TaskCard = ({ title, description }: TaskCardProps) => (
     <div className="bg-purple-200 rounded-md p-4 mb-4">
         <div className="flex items-center mb-2">
-        <Image src="/placeholder.svg?height=32&width=32" width={32} height={32} alt={name} className="rounded-full mr-2" />
-        <span className="font-semibold">{name}</span>
+        <Image src="/placeholder.svg?height=32&width=32" width={32} height={32} alt={title} className="rounded-full mr-2" />
+        <span className="font-semibold">{title}</span>
         </div>
         <p className="text-sm text-gray-600">{description}</p>
     </div>
@@ -24,7 +26,7 @@ const TaskCard = ({ name, description }: TaskCardProps) => (
 
 // Task column component
 interface Task {
-    name: string;
+    title: string;
     description: string;
 }
 
@@ -54,22 +56,8 @@ const TaskColumn = ({ title, tasks }: TaskColumnProps) => (
 
 // Main component
 export default function TaskManager() {
-    const [tasks, setTasks] = useState({
-        todo: [
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
-        ],
-        inProgress: [
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
-        ],
-        waiting: [
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' },
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
-        ],
-        done: [
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' },
-        { name: 'Name', description: 'Short description of what to do, e.g. fund request' }
-        ]
-    })
+    const { id } = useParams();
+    const [tasks, setTasks] = useState(profiles[parseInt(id as string)-1].tasks)
 
     return (
         <div className="flex h-screen">
@@ -88,10 +76,10 @@ export default function TaskManager() {
             </div>
             </div>
             <div className="flex space-x-4">
-            <TaskColumn title="TO DO" tasks={tasks.todo} />
-            <TaskColumn title="IN PROGRESS" tasks={tasks.inProgress} />
-            <TaskColumn title="WAITING" tasks={tasks.waiting} />
-            <TaskColumn title="DONE" tasks={tasks.done} />
+            <TaskColumn title="TO DO" tasks={[tasks[0]]} />
+            <TaskColumn title="IN PROGRESS" tasks={[tasks[1], tasks[2]]} />
+            <TaskColumn title="WAITING" tasks={[tasks[3]]} />
+            <TaskColumn title="DONE" tasks={[tasks[4]]} />
             </div>
         </main>
         </div>
