@@ -72,7 +72,7 @@ export default function Home() {
                 </div>
                 <div className="pt-4">
                     <Link href="/AllyView">
-                        <p className="text-black hover:text-[#9687EC]">Sign in as Ally</p>
+                        <p className="text-black hover:text-[#9687EC] ml-2">Sign in as an Ally</p>
                     </Link>
                 </div>
             </div>

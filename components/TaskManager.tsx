@@ -74,13 +74,13 @@ export default function TaskManager() {
         <div className="flex h-screen">
         <main className="flex-1 overflow-auto">
             <div className="flex justify-between items-center mb-8">
-            <h2 className="text-4xl font-bold text-purple-600">Task Manager</h2>
+            <h2 className="text-4xl font-bold text-[#9687EC]">Task Manager</h2>
             <div className="flex items-center space-x-4">
-                <button className="px-4 py-2 border border-gray-300 rounded-md flex items-center space-x-2 hover:bg-gray-100">
+                <button className="px-4 py-2 border border-[#3D364B] rounded-md flex items-center space-x-2 hover:bg-gray-100">
                 <Filter size={20} />
                 <span>Filters</span>
                 </button>
-                <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                <button className="px-4 py-2 bg-[#3D364B] text-white rounded-md hover:bg-[#9687EC]">
                 + Create Task
                 </button>
             </div>
