@@ -96,7 +96,7 @@ const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
         >
           {/* Fade-up effect on new message */}
           <motion.h1
-            className="text-3xl font-bold m-auto"
+            className="text-3xl font-bold m-auto bg-gradient-to-r from-[#3D364B] to-[#818080] bg-clip-text text-transparent"
             key={displayedMessage} // Use the message content as a key to trigger the animation on change
             initial={{ opacity: 0, y: 20 }} // Initial state: faded out and below position
             animate={{ opacity: 1, y: 0 }} // Animate to visible and original position

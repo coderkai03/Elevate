@@ -107,7 +107,7 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                         isActive && !isSpecial
                             ? 'bg-white text-[#9687EC]'
                             : 'text-gray-600 hover:text-purple-900'
-                    }`}
+                    } cursor-pointer`}
                 >
                     {icon}
                     <span>{label}</span>
