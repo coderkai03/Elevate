@@ -166,7 +166,7 @@ export default function Home() {
 
             <div className="md:w-1/2 flex justify-end items-center h-full mt-[-100px]">
                 <Image 
-                    src="/pic/element.png" // Reference the element from the public folder
+                    src="/pic/element2.png" // Reference the element from the public folder
                     alt="element" 
                     width={1000} // Adjust the width for the element
                     height={1000} // Adjust the height for the element
