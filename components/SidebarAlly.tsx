@@ -1,7 +1,6 @@
 "use client";
 
 import {
-    Home as HomeIcon,
     User,
     ClipboardList,
     PlusCircle,
@@ -11,6 +10,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '@/public/pic/logo.png';
+import { useState, useEffect } from 'react';
 
 interface SidebarProps {
     activeLink: string;
@@ -18,6 +18,13 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
+    // Automatically set "Profiles" as the default active link when the sidebar loads
+    useEffect(() => {
+        if (!activeLink) {
+            setActiveLink('Profiles');
+        }
+    }, [activeLink, setActiveLink]);
+
     return (
         <aside className="relative w-64 p-6 shadow-lg h-screen">
             <div className="flex items-center mb-8">
@@ -43,13 +50,13 @@ export default function Sidebar({ activeLink, setActiveLink }: SidebarProps) {
                     activeLink={activeLink}
                     setActiveLink={setActiveLink}
                 />
-                <NavItem
+                {/* <NavItem
                     label="Task Manager"
                     icon={<ClipboardList size={20} />}
                     href="/task-manager"
                     activeLink={activeLink}
                     setActiveLink={setActiveLink}
-                />
+                /> */}
                 <NavItem
                     label="New Case"
                     icon={<PlusCircle size={20} />}
@@ -94,18 +101,18 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
     return (
         <div className="group">
             <div
-                className={`p-[2px] rounded-md ${
+                className={`relative p-[2px] rounded-md ${
                     isActive && !isSpecial ? 'bg-gradient-to-r from-[#4984EE] to-[#9747FF]' : ''
                 }`}
             >
+                {/* Inner container for the gradient and fill effect */}
                 <div
                     onClick={() => {
                         setActiveLink(label);
-                        // Optionally, you can add navigation logic here if needed
                     }}
                     className={`flex items-center space-x-2 p-2 rounded-md w-full text-left ${
                         isActive && !isSpecial
-                            ? 'bg-white text-[#9687EC]'
+                            ? 'bg-[#F7F7F7] text-[#9687EC]' // Background is now #F7F7F7 for active link
                             : 'text-gray-600 hover:text-purple-900'
                     } cursor-pointer`}
                 >
