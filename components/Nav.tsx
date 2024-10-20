@@ -7,8 +7,8 @@ import HumeLogo from "./logos/Hume"; // Replace with your logo if necessary
 import { Button } from "./ui/button";
 import { Moon, Sun } from "lucide-react";
 import Github from "./logos/GitHub";
-import logo from "./img/logo.png";
-import bg from "./img/background1.png";
+import logo from "@/public/pic/logo.png";
+import bg from "@/public/pic/background1.png";
 import pkg from '@/package.json'; // You can modify this if you don't need it
 
 export const Nav = () => {

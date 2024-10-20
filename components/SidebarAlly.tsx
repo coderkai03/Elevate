@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from './img/logo.png';
+import logo from '@/public/pic/logo.png';
 
 interface SidebarProps {
     activeLink: string;
@@ -107,7 +107,7 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                         isActive && !isSpecial
                             ? 'bg-white text-[#9687EC]'
                             : 'text-gray-600 hover:text-purple-900'
-                    }`}
+                    } cursor-pointer`}
                 >
                     {icon}
                     <span>{label}</span>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Script from 'next/script';
 import { getCaseAndTasks } from '@/app/test/actions/caseActions'; 
 import { fetchUserData } from '@/app/test/page';
+import Link from 'next/link';
 
 interface ProfileCardProps {
     name: string;
@@ -289,7 +290,9 @@ export default function Dashboard(): JSX.Element {
                 </div>
                 <div className="overflow-y-auto h-[calc(100vh-8rem)]">
                 {filteredProfiles.map((profile, index) => (
+                    <Link href={"/view/"+ profile.name}>
                     <ProfileCard key={index} {...profile} />
+                    </Link>
                 ))}
                 </div>
             </div>

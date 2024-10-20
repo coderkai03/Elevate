@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import bg from "../img/background1.png";
-import element from "../img/element.png";
-import logo from "../img/logo.png";
+import bg from "@/public/pic/background1.png";
+import element from "@/public/pic/element.png";
+import logo from "@/public/pic/logo.png";
 
 export default function Home() {
     return (

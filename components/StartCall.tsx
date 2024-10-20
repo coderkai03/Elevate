@@ -241,7 +241,7 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
         className = {`
             absolute bottom-4 right-4 z-50 
           bg-[#74D680] text-[#F7F7F7] hover:bg-[#4E8354]
-            px-6 py-3 text-xl font-bold
+            px-6 py-3 text-xl font-semibold
         `}
       >  
         COMPLETE
@@ -270,14 +270,15 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
                   absolute bottom-0 left-1/2 transform -translate-x-1/2 
                   z-50 flex items-center justify-center
                   w-[150px] h-[50px] rounded-md
-                  bg-[#9687EC] hover:bg-[#9687ec95]
+                  border-[#9687EC] border-[3px] text-[#3D364B]
+                  bg-transparent hover:border-[#3D364B] font-bold hover:bg-transparent
                 "
                 onClick={toggleAnimation}
               >
                 <Phone
                   className="size-6 mr-4"
                   strokeWidth={2}
-                  stroke="#F7F7F7"
+                  stroke="#3D364B"
                 />
                 Start Call
               </Button>
