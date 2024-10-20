@@ -46,6 +46,16 @@ const env = loadEnvConfig(dir).combinedEnv;
             createdAt: { type: "DATETIME(6)", default: "CURRENT_TIMESTAMP(6)" },
             updatedAt: { type: "DATETIME(6)" },
           },
+          //   foreignKeys: [
+          //     {
+          //       columns: ["case_id"],
+          //       reference: {
+          //         table: "cases",
+          //         columns: ["id"],
+          //       },
+          //       onDelete: "CASCADE", // Optional: Define behavior on deletion
+          //     },
+          //   ],
         },
       },
     });
