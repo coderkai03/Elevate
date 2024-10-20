@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { useVoice } from "@humeai/voice-react";
+import { ConnectionMessage, JSONMessage, useVoice } from "@humeai/voice-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Mic, Phone } from "lucide-react";
 import TaskManager from '@/components/TaskManager';
+import { createCase } from '@/app/test/actions/caseActions';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export default function StartCall() {
+export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMessage | ConnectionMessage)[] }) {
   const { status, connect } = useVoice();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -13,6 +15,9 @@ export default function StartCall() {
   const [question, setQuestion] = useState("Say Hello!");
   const [isMuted, setIsMuted] = useState(false); // New state to track mute/unmute
   const [isCallStarted, setIsCallStarted] = useState(false); // Track if the call is started
+
+  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -122,7 +127,111 @@ export default function StartCall() {
 
   const handleExit = () => {
     console.log("Exit button clicked");
+    parseMessages(loggedMessages);
     return <TaskManager/>
+  };
+
+  const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY ?? '');
+
+  const parseMessages = async (messages: (JSONMessage | ConnectionMessage)[]) => {
+    // ask gemini to summarize the conversation
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const conversation = messages
+      .filter((msg): msg is (JSONMessage | ConnectionMessage) =>
+        (msg?.type === "user_message" ||
+        msg?.type === "assistant_message") &&
+        "message" in msg &&
+        msg.message?.content !== undefined
+      )
+      .map((msg) => {
+        if (
+          (msg?.type === "assistant_message" ||
+            msg?.type === "user_message") &&
+          "message" in msg &&
+          msg.message.content
+        ) {
+          return msg.message.content;
+        }
+        return '';
+      })
+      .join("\n");
+    console.log(conversation);
+
+    const response = await model.generateContent(
+      `This is a conversation between a homeless person and a case worker: ${conversation}.
+      Please generate a recap of the conversation and map of (up to 5) tasks that the case worker can
+      help the homeless person using the following JSON format. Do not include any other special characters:
+      {
+        "name": "Name of the homeless person",
+        "age": "Age of the homeless person",
+        "gender": "Gender of the homeless person",
+        "profile_description": "Description of the homeless person",
+        "tasks": [
+          {
+            "case_id": 0,
+            "name": "Name of the task",
+            "description": "Description of the task",
+            "completed": false,
+            "createdAt": "YYYY-MM-DDTHH:mm:ss.sssZ",
+            "updatedAt": "YYYY-MM-DDTHH:mm:ss.sssZ"
+          },
+        ]
+      }`,
+    );
+
+    handleCreateNewCase(response.response.text());
+    console.log(response.response.text());
+  }
+
+  const handleCreateNewCase = async (response: string) => {
+    try {
+      const demographics = JSON.parse(response);
+      const location = await fetchLocation(); // Properly await the location
+      const id = Math.floor(Math.random() * 1000000)
+      const caseData = {
+        ...demographics,
+        id: id,
+        location: JSON.stringify(location),
+        image_link: null,
+        donation_amount: 0,
+      };
+
+      // Log the caseData object with all properties expanded
+      console.log('Case Data:', JSON.parse(JSON.stringify(caseData)));
+
+      const newCase = await createCase(caseData);
+
+      console.log('New Case Result:', newCase);
+      
+      if (newCase.success) {
+        console.log(`New case created successfully! Case ID: ${newCase.caseId}`);
+        // fetchCasesAndTasks(); // Refresh the list after creating a new case
+      } else {
+        console.error(newCase.error || "Error creating new case. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error in handleCreateNewCase:', error);
+    }
+  };
+
+  const fetchLocation = (): Promise<{ lat: number; lon: number } | null> => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ lat: latitude, lon: longitude });
+          },
+          (err) => {
+            console.error(`Geolocation error: ${err.message}`);
+            resolve(null); // Resolve with null in case of error
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+        resolve(null);
+      }
+    });
   };
 
   return (

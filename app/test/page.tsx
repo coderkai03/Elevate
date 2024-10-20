@@ -12,22 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Case, Task } from "@/utils/singleStore";
 // import { Checkbox } from "@/components/ui/checkbox";
 
-export default function Page() {
-  const [message, setMessage] = useState("");
-  const [cases, setCases] = useState<Case[]>([]);
-  const [caseTasks, setCaseTasks] = useState<{ [caseId: number]: Task[] }>({});
-  const [editingCase, setEditingCase] = useState<Case | null>(null);
+export const fetchUserData = async () => {
+  const casesResult = await getCases();
+  if (!casesResult.success) {
+    console.log(casesResult.error);
+    return { cases: [] };
+  }
 
-  useEffect(() => {
-    fetchCasesAndTasks();
-  }, []);
-
-  const fetchCasesAndTasks = async () => {
-    const casesResult = await getCases();
-    if (casesResult.success) {
-      setCases(casesResult.cases || []);
-
-      // Fetch tasks for each case
+  // Fetch tasks for each case
       const tasksPromises =
         casesResult.cases?.map(async (caseItem) => {
           const tasksResult = await getTasks(caseItem.id);
@@ -48,12 +40,23 @@ export default function Page() {
         {}
       );
 
-      setCaseTasks(tasksMap);
-    } else {
-      setMessage(
-        casesResult.error || "Error fetching cases. Please try again."
-      );
-    }
+    return { casesResult, tasksMap };
+};
+
+export default function Page() {
+  const [message, setMessage] = useState("");
+  const [cases, setCases] = useState<Case[]>([]);
+  const [caseTasks, setCaseTasks] = useState<{ [caseId: number]: Task[] }>({});
+  const [editingCase, setEditingCase] = useState<Case | null>(null);
+
+  useEffect(() => {
+    fetchCasesAndTasks();
+  }, []);
+
+  const fetchCasesAndTasks = async () => {
+    const { cases, tasksMap } = await fetchUserData();
+    setCases(cases ?? []);
+    setCaseTasks(tasksMap ?? {});
   };
 
   const handleTaskChange = async (task: Task, completed: boolean) => {

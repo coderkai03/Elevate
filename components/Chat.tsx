@@ -49,7 +49,7 @@ export default function ClientComponent({
       >
         <Messages ref={ref} setLoggedMessages={setLoggedMessages} />
         <Controls loggedMessages={loggedMessages} />
-        <StartCall />
+        <StartCall loggedMessages={loggedMessages} />
       </VoiceProvider>
     </div>
   );

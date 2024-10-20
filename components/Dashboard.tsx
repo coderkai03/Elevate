@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import Script from 'next/script';
+import { getCaseAndTasks } from '@/app/test/actions/caseActions'; 
+import { fetchUserData } from '@/app/test/page';
 
 interface ProfileCardProps {
     name: string;
@@ -64,26 +66,55 @@ declare global {
     }
 }
 
+function addMarkerFromLatLng(map: any, lat: number, lng: number, title: string = '') {
+  const location = new window.google.maps.LatLng((lat), lng);
+  console.log("Adding marker at:", lat, lng);
+  
+  const marker = new window.google.maps.Marker({
+    map: map,
+    position: location,
+    title: title,
+    icon: {
+      path: window.google.maps.SymbolPath.CIRCLE,
+      fillColor: 'red',
+      fillOpacity: 1,
+      strokeWeight: 0,
+      scale: 10
+    }
+  });
+
+  console.log("Marker created:", marker);
+  return marker;
+}
+
+const addMarkerFromAddress = (map: any, address: string) => {
+  console.log("Geocoding address:", address);
+  const geocoder = new window.google.maps.Geocoder();
+  geocoder.geocode({ address: address }, (results: any, status: any) => {
+    if (status === 'OK' && results && results[0]) {
+      const location = results[0].geometry.location;
+      console.log("Geocoded location:", location.lat(), location.lng());
+      const marker = new window.google.maps.Marker({
+        map: map,
+        position: location,
+        title: address,
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: 1,
+          strokeWeight: 0,
+          scale: 10
+        }
+      });
+      console.log("Marker created from address:", marker);
+    } else {
+      console.error("Geocoding failed:", status);
+    }
+  });
+}
+
 export default function Dashboard(): JSX.Element {
-    const [profiles, setProfiles] = useState([
-        {
-        name: 'John Doe',
-        title: 'Software Engineer',
-        progress: 75,
-        status: 'In Progress',
-        joinDate: 'December 2021',
-        avatarUrl: '/placeholder.svg?height=48&width=48',
-        },
-        {
-        name: 'Jane Smith',
-        title: 'Project Manager',
-        progress: 100,
-        status: 'Completed',
-        joinDate: 'November 2021',
-        avatarUrl: '/placeholder.svg?height=48&width=48',
-        },
-        // Add more profiles as needed
-    ]);
+    const [profiles, setProfiles] = useState<ProfileCardProps[]>([]);
 
     const [filter, setFilter] = useState<string>('All');
     const [filterOpen, setFilterOpen] = useState<boolean>(false);
@@ -95,11 +126,30 @@ export default function Dashboard(): JSX.Element {
 
     const mapRef = useRef<HTMLDivElement>(null);
 
-    const initMap = () => {
+    const initMap = async () => {
         if (mapRef.current && window.google) {
         const map = new window.google.maps.Map(mapRef.current, {
-            center: { lat: -33.866, lng: 151.196 },
+            center: { lat: 37.7749, lng: -122.4194 },
             zoom: 15,
+        });
+
+        // Fetch cases locations
+        const { cases, casesResult, tasksMap } = await fetchUserData();
+        if (casesResult) {
+            console.log(casesResult.cases?.map((c: { location: string }) => c.location));
+        } else {
+            console.log('Error fetching cases and tasks');
+        }
+
+        casesResult?.cases?.forEach((c: any) => {
+            setProfiles((prevProfiles) => [...prevProfiles, {
+                name: c.name,
+                title: c.title ?? "",
+                progress: c.progress ?? 0,
+                status: c.status ?? "",
+                joinDate: c.joinDate ?? "",
+                avatarUrl: '/placeholder.svg?height=48&width=48',
+            }]);
         });
 
         const request = {
@@ -111,34 +161,38 @@ export default function Dashboard(): JSX.Element {
         const service = new window.google.maps.places.PlacesService(map);
 
         service.getDetails(request, (place: any, status: any) => {
+            console.log(status === window.google.maps.places.PlacesServiceStatus.OK, place, place.geometry, place.geometry.location);
             if (
             status === window.google.maps.places.PlacesServiceStatus.OK &&
             place &&
             place.geometry &&
             place.geometry.location
             ) {
-            const marker = new window.google.maps.Marker({
-                map,
-                position: place.geometry.location,
-            });
+                console.log("adding: ", casesResult?.cases);
+                casesResult?.cases?.forEach((c: { location: string }) => {
+                console.log("adding marker for", c.location);
+                console.log(JSON.parse(c.location).lat, JSON.parse(c.location).lon);
+                const marker = addMarkerFromLatLng(map, JSON.parse(c.location).lat, JSON.parse(c.location).lon);
 
-            window.google.maps.event.addListener(marker, 'click', () => {
-                const content = document.createElement('div');
-                const nameElement = document.createElement('h2');
+                window.google.maps.event.addListener(marker, 'click', () => {
+                console.log("adding marker");
+                    const content = document.createElement('div');
+                    const nameElement = document.createElement('h2');
 
-                nameElement.textContent = place.name;
-                content.appendChild(nameElement);
+                    nameElement.textContent = place.name;
+                    content.appendChild(nameElement);
 
-                const placeIdElement = document.createElement('p');
-                placeIdElement.textContent = `Place ID: ${place.place_id}`;
-                content.appendChild(placeIdElement);
+                    const placeIdElement = document.createElement('p');
+                    placeIdElement.textContent = `Place ID: ${place.place_id}`;
+                    content.appendChild(placeIdElement);
 
-                const placeAddressElement = document.createElement('p');
-                placeAddressElement.textContent = place.formatted_address;
-                content.appendChild(placeAddressElement);
+                    const placeAddressElement = document.createElement('p');
+                    placeAddressElement.textContent = place.formatted_address;
+                    content.appendChild(placeAddressElement);
 
-                infowindow.setContent(content);
-                infowindow.open(map, marker);
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                });
             });
             }
         });

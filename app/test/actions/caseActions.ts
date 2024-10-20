@@ -23,12 +23,12 @@ export async function createCase(newCase: {
     const [caseResults] = await caseTable.insert([
       {
         name: newCase.name,
-        age: newCase.age,
-        gender: newCase.gender,
-        location: newCase.location,
-        profile_description: newCase.profile_description,
-        image_link: newCase.image_link,
-        donation_amount: newCase.donation_amount,
+        age: newCase.age ?? 0,
+        gender: newCase.gender ?? "",
+        location: newCase.location ?? "",
+        profile_description: newCase.profile_description ?? "",
+        image_link: newCase.image_link ?? "",
+        donation_amount: 0,
       },
     ]);
 
