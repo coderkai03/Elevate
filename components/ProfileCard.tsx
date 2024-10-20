@@ -17,7 +17,7 @@ export default function ProfileCard({ name, title, progress, joinDate, status, a
     const totalAmount = 10000; 
 
     return (
-        <Link href={`/profile/${id}`}>
+        <Link href={`/task-manager/${id}`}>
             <div
             className="bg-white p-6 rounded-lg shadow-md flex flex-col space-y-4 relative cursor-pointer"
         >
