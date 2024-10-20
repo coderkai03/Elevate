@@ -30,6 +30,9 @@ const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
     const { messages } = useVoice();
     const [displayedMessage, setDisplayedMessage] = useState<string>("Say Hello To Start!");
     const [processedAssistantIds, setProcessedAssistantIds] = useState<Set<string>>(new Set());
+    
+    const [floatingEmojis, setFloatingEmojis] = useState<string[]>([]); // State to manage floating emojis
+
     const processAssistantMessages = () => {
       // Find the latest assistant message by iterating backwards
       let latestAssistantMessage: AssistantMessage | null = null;
@@ -50,6 +53,15 @@ const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
     
       // If no new assistant message is found, return
       if (!latestAssistantMessage) return;
+
+      // Assuming you have a way to get matched emotions from the assistant message
+      const matchedEmotions = ["joy", "gratitude", "excitement"]; // Example matched emotions
+
+      // Create emojis based on matched emotions
+      const emojisToFloat = matchedEmotions.map(emotion => expressionEmojis[emotion]).filter(Boolean);
+
+      // Update the floating emojis state
+      setFloatingEmojis(prev => [...prev, ...emojisToFloat]);
     
       // Update the displayed message with only the latest assistant message content
       setDisplayedMessage(latestAssistantMessage.message.content);
@@ -67,9 +79,6 @@ const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
         latestAssistantMessage! as JSONMessage | ConnectionMessage, // Cast to satisfy the type
       ]);
     };
-    
-    
-    
 
     useEffect(() => {
       processAssistantMessages();
@@ -96,6 +105,20 @@ const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
           >
             {displayedMessage} {/* Display the entire concatenated assistant messages */}
           </motion.h1>
+
+          {/* Render floating emojis */}
+          {floatingEmojis.map((emoji, index) => (
+            <motion.span
+              key={index}
+              className="text-4xl" // Adjust size as needed
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 0, y: -50 }} // Float upwards
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1, delay: index * 0.2 }} // Stagger the animation
+            >
+              {emoji}
+            </motion.span>
+          ))}
         </motion.div>
       </motion.div>
     );
