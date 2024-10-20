@@ -162,7 +162,7 @@
 // }
 
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Home, Users, ClipboardList, PlusCircle, Settings, LogOut, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -172,6 +172,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from "@/components/ui/button";
 import { Label } from '@/components/ui/label'; // Add the Label component
 import { PaymentPopupComponent } from '@/components/payment-popup';
+import { fetchUserData } from '@/app/test/page';
 
 interface ProfileOverviewProps {
     id: string;
@@ -238,23 +239,43 @@ const PaymentPopup = ({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (open
     );
 };
 
+interface Profile {
+    name: string;
+    gender: string;
+    age: number;
+    about: string;
+}
+
+import { useParams } from 'next/navigation';
+
 // Main component
-export default function ProfileOverview({ id }: { id: string }) {
-    const [profile, setProfile] = useState({
-        name: 'Name',
-        gender: 'Male',
-        age: 32,
-        about: `Lorem ipsum odor amet, consectetuer adipiscing elit. Morbi pellentesque cubilia integer est tortor metus sociosqu nam. Donec enim in tellus; dictum nibh nisi. Tristique ad sociosqu massa pharetra ultricies felis curae dignissim accumsan. Sollicitudin aenean rhoncus platea ante imperdiet cubilia primis rutrum iaculis. Nunc curae suspendisse in potenti metus praesent.
-
-    Facilisis maecenas dis efficitur gravida taciti aliquam sapien. Blandit aliquam finibus aliquet fermentum bibendum. Etiam tellus quisque ultrices id sollicitudin amet ultrices eros nibh. Massa sem ipsum condimentum faucibus magna faucibus tellus; id neque. Duis mauris ligula et ridiculus tempor fringilla. Gravida facilisi turpis dui dignissim posuere posuere.
-
-    Nisi blandit odio donec mollis tortor nostra fames parturient vestibulum. Efficitur euismod nisi vivamus tempor pellentesque semper sagittis curae. Sagittis ultricies himenaeos convallis litora fringilla; at maecenas. Sagittis purus sollicitudin fermentum euismod malesuada maximus. Facilisi vehicula urna eget sociosqu, curae auctor nisi. Himenaeos dolor conubia commodo ullamcorper et quam. Nostra nostra habitant adipiscing justo nulla mauris cras phasellus. Ridiculus hac eros purus elementum volutpat convallis netus. Vehicula sociosqu dis natoque vestibulum lacinia et. Nunc adipiscing etiam morbi nullam tellus suscipit varius egestas fames.`, // Truncated for brevity
-    });
+export default function ProfileOverview() {
+    const { id } = useParams();
+    const [profile, setProfile] = useState<Profile | null>(null);
 
     const [overallProgress, setOverallProgress] = useState(75);
     const [donationProgress, setDonationProgress] = useState(60);
 
     const [isPaymentOpen, setIsPaymentOpen] = useState(false); // State for payment dialog
+
+    useEffect(() => {
+        async function fetchProfile() {
+            const { cases, casesResult, tasksMap } = await fetchUserData();
+            console.log(casesResult?.cases?.map((c: any) => c.name))
+            if (casesResult && casesResult.cases) {
+                const user = casesResult.cases.find((c: any) => c.name === id)
+                console.log('User: ', user)
+                setProfile({
+                    name: user.name,
+                    gender: user.gender,
+                    age: user.age,
+                    about: user.profile_description
+                })
+            }
+        }
+        fetchProfile()
+        console.log(profile)
+    }, [])
 
     return (
         <div className="flex h-screen bg-purple-50">
@@ -272,17 +293,17 @@ export default function ProfileOverview({ id }: { id: string }) {
                                 src="/placeholder.svg?height=128&width=128"
                                 width={128}
                                 height={128}
-                                alt={profile.name}
+                                alt={profile?.name || 'Profile Picture'}
                                 className="rounded-full"
                             />
                             <div>
-                                <h3 className="text-2xl font-bold mb-2">{profile.name}</h3>
+                                <h3 className="text-2xl font-bold mb-2">{profile?.name}</h3>
                                 <div className="flex space-x-4 mb-2">
                                     <span className="bg-purple-200 text-[#9687EC] px-3 py-1 rounded-full text-sm">
-                                        Gender: {profile.gender}
+                                        Gender: {profile?.gender}
                                     </span>
                                     <span className="bg-purple-200 text-[#9687EC] px-3 py-1 rounded-full text-sm">
-                                        Age: {profile.age}
+                                        Age: {profile?.age}
                                     </span>
                                 </div>
                                 <div className="space-x-4">
@@ -311,7 +332,7 @@ export default function ProfileOverview({ id }: { id: string }) {
                     </div>
                     <div className="p-6">
                         <h4 className="text-xl font-semibold mb-4">About</h4>
-                        <p className="text-gray-700 whitespace-pre-line">{profile.about}</p>
+                        <p className="text-gray-700 whitespace-pre-line">{profile?.about}</p>
                     </div>
                 </div>
             </main>
