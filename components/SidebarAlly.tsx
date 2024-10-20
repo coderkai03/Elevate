@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import logo from './img/logo.png';
+import logo from '@/public/pic/logo.png';
 
 interface SidebarProps {
     activeLink: string;

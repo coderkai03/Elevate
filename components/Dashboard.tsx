@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import Script from 'next/script';
+import Link from 'next/link';
 
 interface ProfileCardProps {
     name: string;
@@ -72,7 +73,8 @@ export default function Dashboard(): JSX.Element {
         progress: 75,
         status: 'In Progress',
         joinDate: 'December 2021',
-        avatarUrl: '/placeholder.svg?height=48&width=48',
+        avatarUrl: '/pic/p1.jpeg',
+        id: 1
         },
         {
         name: 'Jane Smith',
@@ -80,9 +82,9 @@ export default function Dashboard(): JSX.Element {
         progress: 100,
         status: 'Completed',
         joinDate: 'November 2021',
-        avatarUrl: '/placeholder.svg?height=48&width=48',
+        avatarUrl: '/pic/p3.jpg',
+        id: 2
         },
-        // Add more profiles as needed
     ]);
 
     const [filter, setFilter] = useState<string>('All');
@@ -235,7 +237,9 @@ export default function Dashboard(): JSX.Element {
                 </div>
                 <div className="overflow-y-auto h-[calc(100vh-8rem)]">
                 {filteredProfiles.map((profile, index) => (
+                    <Link href={"/view/"+ profile.id}>
                     <ProfileCard key={index} {...profile} />
+                    </Link>
                 ))}
                 </div>
             </div>
