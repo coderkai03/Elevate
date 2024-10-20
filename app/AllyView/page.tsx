@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for Next.js navigation
 import Sidebar from '@/components/SidebarAlly';
 import Profiles from '@/components/Profiles';
