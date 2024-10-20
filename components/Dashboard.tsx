@@ -8,6 +8,7 @@ import { getCaseAndTasks } from '@/app/test/actions/caseActions';
 import { fetchUserData } from '@/app/test/page';
 import Link from 'next/link';
 import defaultPfp from '@/public/default-pfp.jpg';
+import { profiles as dummyProfiles } from '@/components/Profiles';  // Rename the import to dummyProfiles
 
 interface ProfileCardProps {
     name: string;
@@ -187,7 +188,6 @@ export default function Dashboard(): JSX.Element {
             onLoad={initMap}
         />
 
-
         <div className="flex h-screen">
             <main className="flex-1 flex">
             <div className="flex-1 mr-4">
@@ -244,11 +244,18 @@ export default function Dashboard(): JSX.Element {
                 </div>
                 </div>
                 <div className="overflow-y-auto h-[calc(100vh-8rem)]">
-                {filteredProfiles.map((profile, index) => (
-                    <Link href={"/view/"+ profile.name}>
-                    <ProfileCard key={index} {...profile} />
-                    </Link>
-                ))}
+                    {/* Inject 5 dummy profiles */}
+                    {dummyProfiles.slice(0, 5).map((profile, index) => (
+                        <Link href={"/view/"+ profile.id} key={index}>
+                            <ProfileCard {...profile} />
+                        </Link>
+                    ))}
+                    {/* Keep filtered profiles */}
+                    {filteredProfiles.map((profile, index) => (
+                        <Link href={"/view/"+ profile.name} key={`filtered-${index}`}>
+                            <ProfileCard {...profile} />
+                        </Link>
+                    ))}
                 </div>
             </div>
             </main>

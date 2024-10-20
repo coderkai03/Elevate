@@ -247,6 +247,7 @@ interface Profile {
 }
 
 import { useParams } from 'next/navigation';
+import { profiles } from '@/components/Profiles';
 
 // Main component
 export default function ProfileOverview() {
@@ -259,22 +260,33 @@ export default function ProfileOverview() {
     const [isPaymentOpen, setIsPaymentOpen] = useState(false); // State for payment dialog
 
     useEffect(() => {
-        async function fetchProfile() {
-            const { cases, casesResult, tasksMap } = await fetchUserData();
-            console.log(casesResult?.cases?.map((c: any) => c.name))
-            if (casesResult && casesResult.cases) {
-                const user = casesResult.cases.find((c: any) => c.name === id)
-                console.log('User: ', user)
-                setProfile({
-                    name: user.name,
-                    gender: user.gender,
-                    age: user.age,
-                    about: user.profile_description
-                })
-            }
+        // async function fetchProfile() {
+        //     const { cases, casesResult, tasksMap } = await fetchUserData();
+        //     console.log(casesResult?.cases?.map((c: any) => c.name))
+        //     if (casesResult && casesResult.cases) {
+        //         const user = casesResult.cases.find((c: any) => c.name === id)
+        //         console.log('User: ', user)
+        //         setProfile({
+        //             name: user.name,
+        //             gender: user.gender,
+        //             age: user.age,
+        //             about: user.profile_description
+        //         })
+        //     }
+        // }
+        // fetchProfile()
+        // console.log(profile)
+
+        const profileData = profiles.find(p => p.id.toString() === id);
+        if (profileData) {
+            setProfile({
+                name: profileData.name,
+                gender: profileData.gender,
+                age: profileData.age,
+                about: profileData.about
+            });
         }
-        fetchProfile()
-        console.log(profile)
+        console.log(profile);
     }, [])
 
     return (
@@ -290,7 +302,7 @@ export default function ProfileOverview() {
                         {/* Left side: Profile image and info */}
                         <div className="flex items-center space-x-6">
                             <Image
-                                src="/placeholder.svg?height=128&width=128"
+                                src={profile?.avatarUrl || '/default-pfp.jpg'}
                                 width={128}
                                 height={128}
                                 alt={profile?.name || 'Profile Picture'}

@@ -14,7 +14,7 @@ export const profiles = [
         avatarUrl: '/default-pfp.jpg',
         age: 20,
         gender: 'Female',
-        about: 'Lia is a young woman experiencing homelessness due to a series of unfortunate events. At just 20 years old, she\'s determined to find stable housing and employment while addressing her immediate needs.',
+        about: 'Lia is a young woman experiencing homelessness due to a series of unfortunate events. At just 20 years old, she\'s determined to find stable housing and employment while addressing her immediate needs. Lia grew up in a troubled home and left at 18 to escape an abusive situation. She\'s been struggling to make ends meet ever since, often relying on temporary shelters and the kindness of strangers. Despite her challenges, Lia remains optimistic and is actively working to improve her situation. She\'s currently seeking part-time work while also looking into educational opportunities to build a better future for herself. Lia\'s immediate goals include securing a spot in a youth housing program, finding steady employment, and eventually enrolling in community college courses. She\'s particularly interested in social work, inspired by the people who have helped her along the way.',
         tasks: [
             { title: "Shelter Registration", description: "Register at local youth shelter for temporary accommodation" },
             { title: "Food Assistance", description: "Apply for SNAP benefits and locate nearby food banks" },
