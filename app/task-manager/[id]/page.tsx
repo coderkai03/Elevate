@@ -54,7 +54,7 @@ const TaskColumn = ({ title, tasks }: TaskColumnProps) => (
 // Main component
 export default function TaskManager() {
     const { id } = useParams();
-    const profile = profiles[parseInt(id as string) - 1]; // Retrieve the profile based on id
+    const profile = parseInt(id as string) === 0 ? profiles[0] : profiles[parseInt(id as string) - 1]; // Retrieve the profile based on id
     const [tasks, setTasks] = useState(profile.tasks); // Get tasks from the profile
 
     return (

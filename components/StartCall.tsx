@@ -6,6 +6,8 @@ import { Mic, Phone } from "lucide-react";
 import TaskManager from '@/components/TaskManager';
 import { createCase } from '@/app/test/actions/caseActions';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMessage | ConnectionMessage)[] }) {
   const { status, connect } = useVoice();
@@ -18,6 +20,8 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
 
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -128,7 +132,7 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
   const handleExit = () => {
     console.log("Exit button clicked");
     parseMessages(loggedMessages);
-    return <TaskManager/>
+    router.push(`/task-manager/${0}`);
   };
 
   const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY ?? '');
@@ -188,6 +192,44 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
       const demographics = JSON.parse(response);
       const location = await fetchLocation(); // Properly await the location
       const id = Math.floor(Math.random() * 1000000)
+      // Create default tasks
+      const defaultTasks = [
+        {
+          id: Math.floor(Math.random() * 1000000),
+          case_id: id,
+          name: "File for Driver's License",
+          description: "Assist in gathering necessary documents and filing for a driver's license or state ID.",
+          completed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: Math.floor(Math.random() * 1000000),
+          case_id: id,
+          name: "Contact Local Housing Support",
+          description: "Reach out to local housing authorities or shelters to explore housing options.",
+          completed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: Math.floor(Math.random() * 1000000),
+          case_id: id,
+          name: "Apply for Food Stamps",
+          description: "Help with the application process for SNAP (Supplemental Nutrition Assistance Program) benefits.",
+          completed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+
+      // Add default tasks to the demographics object if it doesn't already have tasks
+      if (!demographics.tasks || demographics.tasks.length === 0) {
+        demographics.tasks = defaultTasks;
+      } else {
+        // Append default tasks to existing tasks
+        demographics.tasks = [...demographics.tasks, ...defaultTasks];
+      }
       const caseData = {
         ...demographics,
         id: id,
@@ -236,16 +278,18 @@ export default function StartCall({ loggedMessages }: { loggedMessages: (JSONMes
 
   return (
     <div className="relativex">
+      <Link href={`/task-manager/${0}`}>
       <Button
-        onClick = {handleExit}
+        // onClick = {handleExit}
         className = {`
-            absolute bottom-4 right-4 z-50 
+          absolute bottom-4 right-4 z-50 
           bg-[#74D680] text-[#F7F7F7] hover:bg-[#4E8354]
-            px-6 py-3 text-xl font-semibold
-        `}
-      >  
+          px-6 py-3 text-xl font-semibold
+          `}
+          >  
         COMPLETE
       </Button>
+          </Link>
       <AnimatePresence>
         <motion.div
           className="relative flex items-center justify-center"

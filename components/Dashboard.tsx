@@ -7,6 +7,7 @@ import Script from 'next/script';
 import { getCaseAndTasks } from '@/app/test/actions/caseActions'; 
 import { fetchUserData } from '@/app/test/page';
 import Link from 'next/link';
+import defaultPfp from '@/public/default-pfp.jpg';
 
 interface ProfileCardProps {
     name: string;
@@ -67,7 +68,7 @@ declare global {
     }
 }
 
-function addMarkerFromLatLng(map: any, lat: number, lng: number, title: string = '') {
+function addMarkerFromLatLng(map: any, lat: number, lng: number, name: string, title: string = '') {
   const location = new window.google.maps.LatLng((lat), lng);
   console.log("Adding marker at:", lat, lng);
   
@@ -85,33 +86,7 @@ function addMarkerFromLatLng(map: any, lat: number, lng: number, title: string =
   });
 
   console.log("Marker created:", marker);
-  return marker;
-}
-
-const addMarkerFromAddress = (map: any, address: string) => {
-  console.log("Geocoding address:", address);
-  const geocoder = new window.google.maps.Geocoder();
-  geocoder.geocode({ address: address }, (results: any, status: any) => {
-    if (status === 'OK' && results && results[0]) {
-      const location = results[0].geometry.location;
-      console.log("Geocoded location:", location.lat(), location.lng());
-      const marker = new window.google.maps.Marker({
-        map: map,
-        position: location,
-        title: address,
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          fillColor: 'red',
-          fillOpacity: 1,
-          strokeWeight: 0,
-          scale: 10
-        }
-      });
-      console.log("Marker created from address:", marker);
-    } else {
-      console.error("Geocoding failed:", status);
-    }
-  });
+  return { marker, name };  // Return both the marker and the name
 }
 
 export default function Dashboard(): JSX.Element {
@@ -129,74 +104,54 @@ export default function Dashboard(): JSX.Element {
 
     const initMap = async () => {
         if (mapRef.current && window.google) {
-        const map = new window.google.maps.Map(mapRef.current, {
-            center: { lat: 37.7749, lng: -122.4194 },
-            zoom: 15,
-        });
+            const map = new window.google.maps.Map(mapRef.current, {
+                center: { lat: 37.7749, lng: -122.4194 },
+                zoom: 15,
+            });
 
-        // Fetch cases locations
-        const { cases, casesResult, tasksMap } = await fetchUserData();
-        if (casesResult) {
-            console.log(casesResult.cases?.map((c: { location: string }) => c.location));
-        } else {
-            console.log('Error fetching cases and tasks');
-        }
+            // Fetch cases locations
+            const { cases, casesResult, tasksMap } = await fetchUserData();
+            if (casesResult) {
+                console.log(casesResult.cases?.map((c: { location: string }) => c.location));
+            } else {
+                console.log('Error fetching cases and tasks');
+            }
 
-        casesResult?.cases?.forEach((c: any) => {
-            setProfiles((prevProfiles) => [...prevProfiles, {
-                name: c.name,
-                title: c.title ?? "",
-                progress: c.progress ?? 0,
-                status: c.status ?? "",
-                joinDate: c.joinDate ?? "",
-                avatarUrl: '/placeholder.svg?height=48&width=48',
-            }]);
-        });
+            const infowindow = new window.google.maps.InfoWindow();
 
-        const request = {
-            placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
-            fields: ['name', 'formatted_address', 'place_id', 'geometry'],
-        };
-
-        const infowindow = new window.google.maps.InfoWindow();
-        const service = new window.google.maps.places.PlacesService(map);
-
-        service.getDetails(request, (place: any, status: any) => {
-            console.log(status === window.google.maps.places.PlacesServiceStatus.OK, place, place.geometry, place.geometry.location);
-            if (
-            status === window.google.maps.places.PlacesServiceStatus.OK &&
-            place &&
-            place.geometry &&
-            place.geometry.location
-            ) {
-                console.log("adding: ", casesResult?.cases);
-                casesResult?.cases?.forEach((c: { location: string }) => {
+            casesResult?.cases?.forEach((c: any) => {
                 console.log("adding marker for", c.location);
                 console.log(JSON.parse(c.location).lat, JSON.parse(c.location).lon);
-                const marker = addMarkerFromLatLng(map, JSON.parse(c.location).lat, JSON.parse(c.location).lon);
+                const { marker, name } = addMarkerFromLatLng(map, JSON.parse(c.location).lat, JSON.parse(c.location).lon, c.name);
 
                 window.google.maps.event.addListener(marker, 'click', () => {
-                console.log("adding marker");
+                    console.log("Marker clicked for:", name);
                     const content = document.createElement('div');
                     const nameElement = document.createElement('h2');
+                    const ageElement = document.createElement('h2');
+                    const genderElement = document.createElement('h2');
 
-                    nameElement.textContent = place.name;
+                    nameElement.textContent = "Name: " + name;
+                    ageElement.textContent = "Age: " + c.age;
+                    genderElement.textContent = "Gender: " + c.gender;
+
                     content.appendChild(nameElement);
-
-                    const placeIdElement = document.createElement('p');
-                    placeIdElement.textContent = `Place ID: ${place.place_id}`;
-                    content.appendChild(placeIdElement);
-
-                    const placeAddressElement = document.createElement('p');
-                    placeAddressElement.textContent = place.formatted_address;
-                    content.appendChild(placeAddressElement);
+                    content.appendChild(ageElement);
+                    content.appendChild(genderElement);
 
                     infowindow.setContent(content);
                     infowindow.open(map, marker);
                 });
+
+                setProfiles((prevProfiles) => [...prevProfiles, {
+                    name: c.name,
+                    title: c.title ?? "",
+                    progress: c.progress ?? 0,
+                    status: c.status ?? "",
+                    joinDate: c.joinDate ?? "",
+                    avatarUrl: defaultPfp.src,
+                }]);
             });
-            }
-        });
         }
     };
 

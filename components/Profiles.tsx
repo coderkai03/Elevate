@@ -3,6 +3,26 @@ import { Search, ChevronDown } from 'lucide-react';
 import ProfileCard from './ProfileCard';
 
 export const profiles = [
+    {
+        id: 0,  // Assuming this is the next available ID
+        name: 'Lia Juan',
+        title: 'Homeless Individual',
+        amount: 150.25,
+        joinDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        status: 'In Progress',
+        progress: 15,
+        avatarUrl: '/default-pfp.jpg',
+        age: 20,
+        gender: 'Female',
+        about: 'Lia is a young woman experiencing homelessness due to a series of unfortunate events. At just 20 years old, she\'s determined to find stable housing and employment while addressing her immediate needs.',
+        tasks: [
+            { title: "Shelter Registration", description: "Register at local youth shelter for temporary accommodation" },
+            { title: "Food Assistance", description: "Apply for SNAP benefits and locate nearby food banks" },
+            { title: "Job Search", description: "Visit local library to use computers for job searching and application submissions" },
+            { title: "Health Check-up", description: "Schedule appointment at free clinic for general health assessment" },
+            { title: "Education Options", description: "Explore GED programs or community college courses to improve future prospects" }
+        ]
+    },
     { 
         id: 1, 
         name: 'John Doe', 
@@ -245,8 +265,8 @@ export default function Dashboard() {
         <div className="flex-1 overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredProfiles.length > 0 ? (
-                filteredProfiles.map((profile, index) => (
-                <ProfileCard key={index} {...profile} />
+                filteredProfiles.slice(1).map((profile, index) => (
+                <ProfileCard key={index + 1} {...profile} />
                 ))
             ) : (
                 <p className="text-center">No profiles found.</p>
