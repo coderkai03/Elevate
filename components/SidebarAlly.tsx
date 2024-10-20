@@ -98,17 +98,19 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                     isActive && !isSpecial ? 'bg-gradient-to-r from-[#4984EE] to-[#9747FF]' : ''
                 }`}
             >
-                <button
-                    onClick={() => setActiveLink(label)}
-                    className={`flex items-center space-x-2 p-2 rounded-md w-full text-left ${
-                        isActive && !isSpecial
-                            ? 'bg-white text-[#9687EC]'
-                            : 'text-gray-600 hover:text-purple-900'
-                    }`}
-                >
-                    {icon}
-                    <span>{label}</span>
-                </button>
+                <Link href={href}>
+                    <a
+                        onClick={() => setActiveLink(label)}
+                        className={`flex items-center space-x-2 p-2 rounded-md w-full text-left ${
+                            isActive && !isSpecial
+                                ? 'bg-white text-[#9687EC]'
+                                : 'text-gray-600 hover:text-purple-900'
+                        }`}
+                    >
+                        {icon}
+                        <span>{label}</span>
+                    </a>
+                </Link>
             </div>
         </div>
     );

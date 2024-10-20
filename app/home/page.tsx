@@ -3,7 +3,6 @@ import Link from "next/link";
 import bg from "../img/background1.png";
 import element from "../img/element.png";
 import logo from "../img/logo.png";
-// import { Nav } from "@/components/Nav";
 
 export default function Home() {
     return (
@@ -15,8 +14,6 @@ export default function Home() {
                 backgroundPosition: 'center',
             }}
         >
-        
-        {/* <Nav/> */}
 
         <header className="container mx-auto px-4 py-6 flex items-center justify-between">
             <div className="flex items-center space-x-2">

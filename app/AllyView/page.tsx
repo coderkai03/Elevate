@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for Next.js navigation
 import Sidebar from '@/components/SidebarAlly';
 import Dashboard from '@/components/Dashboard';
 import Profiles from '@/components/Profiles';
 import TaskManager from '@/components/TaskManager';
-import NewCase from '@/components/NewCase';
+// import NewCase from '@/components/NewCase';
+import dynamic from 'next/dynamic';
+// import NewCase from '@/components/NewCase';
+const HumeChatComponent = dynamic(() => import('@/components/HumeChatComponent'), {
+    ssr: false,
+});
 
 export default function MainLayout() {
     const [activeLink, setActiveLink] = useState('Dashboard');
@@ -24,7 +29,7 @@ export default function MainLayout() {
             case 'Task Manager':
                 return <TaskManager />;
             case 'New Case':
-                return <NewCase />;
+                return <HumeChatComponent />;
             case 'LogOut':
                 return null;
             default:

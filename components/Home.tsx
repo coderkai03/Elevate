@@ -60,7 +60,7 @@ export default function Home() {
                     Crowdfunding
                 </h2>
                 <div className="flex space-x-4">
-                    <Link href="/Demo">
+                    <Link href="/demo">
                         <button className="bg-white text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 transition duration-100">
                             Try demo
                         </button>
