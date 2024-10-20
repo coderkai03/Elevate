@@ -1,159 +1,105 @@
-// "use client";
-// import { cn } from "@/utils";
-// import { ConnectionMessage, JSONMessage, useVoice } from "@humeai/voice-react";
-// import Expressions from "./Expressions";
-// import { AnimatePresence, motion } from "framer-motion";
-// import { ComponentRef, forwardRef, useEffect, useState } from "react";
-
-// const Messages = forwardRef<
-//   ComponentRef<typeof motion.div>,
-//   { setLoggedMessages: (message: (JSONMessage | ConnectionMessage)[]) => void }
-// >(function Messages({ setLoggedMessages }, ref) {
-//   const { messages } = useVoice();
-
-//   useEffect(() => {
-//     if (messages.length === 0) return;
-    
-//     const lastMessage = messages[messages.length - 1];
-//     if (
-//       (lastMessage?.type === "assistant_message" ||
-//         lastMessage?.type === "user_message") &&
-//       "message" in lastMessage &&
-//       lastMessage.message.content
-//     ) {
-//       setLoggedMessages([...messages, lastMessage]);
-//       console.log(lastMessage.message.content);
-//     }
-//   }, [messages]);
-
-//   return (
-//     <motion.div
-//       layoutScroll
-//       // className={"grow rounded-md overflow-auto p-4"}
-//       ref={ref}
-//     >
-//       <motion.div
-//         className={"max-w-2xl mx-auto w-full flex flex-col gap-4 pb-24"}
-//       >
-//         <AnimatePresence mode={"popLayout"}>
-//           {messages.map((msg, index) => {
-//             if (
-//               msg.type === "user_message" ||
-//               msg.type === "assistant_message"
-//             ) {
-//               return (
-//                 <motion.div
-//                   key={msg.type + index}
-//                   className={cn(
-//                     "w-[80%]",
-//                     "bg-card",
-//                     "border border-border rounded",
-//                     msg.type === "user_message" ? "ml-auto" : ""
-//                   )}
-//                   initial={{
-//                     opacity: 0,
-//                     y: 10,
-//                   }}
-//                   animate={{
-//                     opacity: 1,
-//                     y: 0,
-//                   }}
-//                   exit={{
-//                     opacity: 0,
-//                     y: 0,
-//                   }}
-//                 >
-//                   <div
-//                     className={cn(
-//                       "text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3"
-//                     )}
-//                   >
-//                     {msg.message.role}
-//                   </div>
-//                   <div className={"pb-3 px-3"}>{msg.message.content}</div>
-//                   <Expressions values={{ ...msg.models.prosody?.scores }} />
-//                 </motion.div>
-//               );
-//             }
-
-//             return null;
-//           })}
-//         </AnimatePresence>
-//       </motion.div>
-//     </motion.div>
-//   );
-// });
-
-// //function that logs the messages to the console
-// function logMessages(message: string | undefined) {
-//   if (message) {
-//     console.log(message);
-//   }
-//   return message;
-// }
-
-// export default Messages;
-
 "use client";
 import { cn } from "@/utils";
 import { ConnectionMessage, JSONMessage, useVoice } from "@humeai/voice-react";
 import { motion } from "framer-motion";
 import { ComponentRef, forwardRef, useEffect, useState } from "react";
-import { Typewriter } from "react-simple-typewriter"; // Import typewriter library
+import { expressionEmojis } from "@/utils/expressionLabels";
 
-const Messages = forwardRef<
-  ComponentRef<typeof motion.div>,
-  { setLoggedMessages: (message: (JSONMessage | ConnectionMessage)[]) => void }
->(function Messages({ setLoggedMessages }, ref) {
-  const { messages } = useVoice();
-  const [displayedMessage, setDisplayedMessage] = useState<string>("Say Hello To Start!"); // Start with 'Say hello'
-  const [hasTyped, setHasTyped] = useState<boolean>(false);
+// Define the type for props
+interface MessagesProps {
+  setLoggedMessages: (
+    message: (JSONMessage | ConnectionMessage)[] | ((prev: (JSONMessage | ConnectionMessage)[]) => (JSONMessage | ConnectionMessage)[])
+  ) => void;
+}
 
-  useEffect(() => {
-    if (messages.length === 0) return;
+// Define a specific interface for Assistant Messages
+interface AssistantMessage {
+  type: "assistant_message";
+  id: string;
+  message: {
+    role: string;
+    content: string;
+  };
+}
 
-    const lastMessage = messages[messages.length - 1];
+type LoggedMessage = JSONMessage | ConnectionMessage | AssistantMessage;
 
-    // Only process the assistant messages
-    if (
-      lastMessage?.type === "assistant_message" &&
-      "message" in lastMessage &&
-      lastMessage.message.content &&
-      !hasTyped
-    ) {
-      console.log('logging ', lastMessage.message.content)
-      setLoggedMessages([...messages, lastMessage]);
 
-      // Set the message content from the assistant
-      setDisplayedMessage(lastMessage.message.content);
-      setHasTyped(true);
-    }
-  }, [messages]);
+const Messages = forwardRef<ComponentRef<typeof motion.div>, MessagesProps>(
+  function Messages({ setLoggedMessages }, ref) {
+    const { messages } = useVoice();
+    const [displayedMessage, setDisplayedMessage] = useState<string>("Say Hello To Start!");
+    const [processedAssistantIds, setProcessedAssistantIds] = useState<Set<string>>(new Set());
+    const processAssistantMessages = () => {
+      // Find the latest assistant message by iterating backwards
+      let latestAssistantMessage: AssistantMessage | null = null;
+    
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const msg = messages[i];
+        if (
+          msg.type === "assistant_message" &&
+          msg.message &&
+          typeof msg.message.content === "string" &&
+          typeof msg.id === "string" &&
+          !processedAssistantIds.has(msg.id)
+        ) {
+          latestAssistantMessage = msg as AssistantMessage;
+          break; // Once the most recent assistant message is found, stop the loop
+        }
+      }
+    
+      // If no new assistant message is found, return
+      if (!latestAssistantMessage) return;
+    
+      // Update the displayed message with only the latest assistant message content
+      setDisplayedMessage(latestAssistantMessage.message.content);
+    
+      // Add the message ID to the processed set to avoid future duplication
+      setProcessedAssistantIds((prev) => {
+        const updatedSet = new Set(prev);
+        updatedSet.add(latestAssistantMessage!.id);
+        return updatedSet;
+      });
+    
+      // Update the logged messages with only the latest assistant message
+      setLoggedMessages((prevLoggedMessages: (JSONMessage | ConnectionMessage)[]) => [
+        ...prevLoggedMessages,
+        latestAssistantMessage! as JSONMessage | ConnectionMessage, // Cast to satisfy the type
+      ]);
+    };
+    
+    
+    
 
-  return (
-    <motion.div
-      layoutScroll
-      ref={ref}
-      className={"flex justify-center items-center mt-[200px] mb-[-50px] text-[#3D364B]"}
-    >
+    useEffect(() => {
+      processAssistantMessages();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages]); // Dependency array ensures this runs whenever 'messages' updates
+
+    return (
       <motion.div
-        className={"max-w-2xl mx-auto w-full flex flex-col gap-4 pb-24 text-center"}
+        layoutScroll
+        ref={ref}
+        className={"flex justify-center items-center mt-[200px] mb-[-50px] text-[#3D364B]"}
       >
-        {/* Typewriter effect for the message display */}
-        <h1 className="text-3xl font-bold m-auto">
-          <Typewriter
-            words={[displayedMessage]} // Show the assistant's message as typewriter effect
-            loop={false}
-            cursor
-            cursorStyle="|"
-            typeSpeed={50}
-            deleteSpeed={50}
-            delaySpeed={50}
-          />
-        </h1>
+        <motion.div
+          className={"max-w-2xl mx-auto w-full flex flex-col gap-4 pb-24 text-center"}
+        >
+          {/* Fade-up effect on new message */}
+          <motion.h1
+            className="text-3xl font-bold m-auto"
+            key={displayedMessage} // Use the message content as a key to trigger the animation on change
+            initial={{ opacity: 0, y: 20 }} // Initial state: faded out and below position
+            animate={{ opacity: 1, y: 0 }} // Animate to visible and original position
+            exit={{ opacity: 0, y: -20 }} // Exit state: fade out and move upward
+            transition={{ duration: 0.5 }} // Duration of the transition
+          >
+            {displayedMessage} {/* Display the entire concatenated assistant messages */}
+          </motion.h1>
+        </motion.div>
       </motion.div>
-    </motion.div>
-  );
-});
+    );
+  }
+);
 
 export default Messages;
