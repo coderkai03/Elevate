@@ -98,8 +98,11 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                     isActive && !isSpecial ? 'bg-gradient-to-r from-[#4984EE] to-[#9747FF]' : ''
                 }`}
             >
-                <button
-                    onClick={() => setActiveLink(label)}
+                <div
+                    onClick={() => {
+                        setActiveLink(label);
+                        // Optionally, you can add navigation logic here if needed
+                    }}
                     className={`flex items-center space-x-2 p-2 rounded-md w-full text-left ${
                         isActive && !isSpecial
                             ? 'bg-white text-[#9687EC]'
@@ -108,7 +111,7 @@ function NavItem({ label, icon, href, activeLink, setActiveLink }: NavItemProps)
                 >
                     {icon}
                     <span>{label}</span>
-                </button>
+                </div>
             </div>
         </div>
     );

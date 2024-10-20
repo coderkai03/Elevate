@@ -1,155 +1,246 @@
-// function initMap() {
-//     const map = new google.maps.Map(document.getElementById("map"), {
-//       center: { lat: -33.866, lng: 151.196 },
-//       zoom: 15,
-//     });
-//     const request = {
-//       placeId: "ChIJN1t_tDeuEmsRUsoyG83frY4",
-//       fields: ["name", "formatted_address", "place_id", "geometry"],
-//     };
-//     const infowindow = new google.maps.InfoWindow();
-//     const service = new google.maps.places.PlacesService(map);
-  
-//     service.getDetails(request, (place, status) => {
-//       if (
-//         status === google.maps.places.PlacesServiceStatus.OK &&
-//         place &&
-//         place.geometry &&
-//         place.geometry.location
-//       ) {
-//         const marker = new google.maps.Marker({
-//           map,
-//           position: place.geometry.location,
-//         });
-  
-//         google.maps.event.addListener(marker, "click", () => {
-//           const content = document.createElement("div");
-//           const nameElement = document.createElement("h2");
-  
-//           nameElement.textContent = place.name;
-//           content.appendChild(nameElement);
-  
-//           const placeIdElement = document.createElement("p");
-  
-//           placeIdElement.textContent = place.place_id;
-//           content.appendChild(placeIdElement);
-  
-//           const placeAddressElement = document.createElement("p");
-  
-//           placeAddressElement.textContent = place.formatted_address;
-//           content.appendChild(placeAddressElement);
-//           infowindow.setContent(content);
-//           infowindow.open(map, marker);
-//         });
-//       }
-//     });
-//   }
-  
-//   window.initMap = initMap;
+"use client";
 
-import { useState } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
-import ProfileCard from './ProfileCard';
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import Script from 'next/script';
 
-export const profiles = [
-    { id: 1, name: 'John Doe', title: 'Designer', amount: 1000.22, joinDate: 'December 2021', status: 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80', age: 30 },
-    { id: 2, name: 'Jane Smith', title: 'Developer', amount: 1200.45, joinDate: 'January 2022', status: 'In Progress', progress: 78.6, avatarUrl: '/placeholder.svg?height=80&width=80', age: 28 },
-    { id: 3, name: 'Michael Brown', title: 'Project Manager', amount: 1300.50, joinDate: 'February 2022', status: 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80', age: 35 },
-    { id: 4, name: 'Sarah Johnson', title: 'Tester', amount: 1400.80, joinDate: 'March 2022', status: 'In Progress', progress: 52.3, avatarUrl: '/placeholder.svg?height=80&width=80', age: 26 },
-    { id: 5, name: 'Chris Lee', title: 'Designer', amount: 1100.10, joinDate: 'April 2022', status: 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80', age: 32 },
-    { id: 6, name: 'Emma Davis', title: 'Developer', amount: 1050.75, joinDate: 'May 2022', status: 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80', age: 29 },
-    { id: 7, name: 'James Wilson', title: 'Tester', amount: 1150.30, joinDate: 'June 2022', status: 'In Progress', progress: 67.8, avatarUrl: '/placeholder.svg?height=80&width=80', age: 31 },
-    { id: 8, name: 'Sophia Martinez', title: 'Project Manager', amount: 1250.90, joinDate: 'July 2022', status: 'Completed', progress: null, avatarUrl: '/placeholder.svg?height=80&width=80', age: 34 },
-];
+interface ProfileCardProps {
+    name: string;
+    title: string;
+    progress: number;
+    status: string;
+    joinDate: string;
+    avatarUrl: string;
+}
 
-export default function Dashboard() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filter, setFilter] = useState('All');
-    const [filterOpen, setFilterOpen] = useState(false); // To toggle filter dropdown visibility
+// Profile card component
+const ProfileCard = ({
+    name,
+    title,
+    progress,
+    status,
+    joinDate,
+    avatarUrl,
+    }: ProfileCardProps) => (
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div className="flex items-center space-x-4">
+        <Image
+            src={avatarUrl}
+            alt={name}
+            width={48}
+            height={48}
+            className="rounded-full"
+        />
+        <div>
+            <h3 className="font-semibold">{name}</h3>
+            <p className="text-sm text-gray-600">{title}</p>
+        </div>
+        <span
+            className={`ml-auto px-2 py-1 rounded-full text-xs ${
+            status === 'Completed'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'
+            }`}
+        >
+            {status}
+        </span>
+        </div>
+        <div className="mt-4">
+        <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+            className="bg-purple-600 h-2 rounded-full"
+            style={{ width: `${progress}%` }}
+            ></div>
+        </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">Joined {joinDate}</p>
+    </div>
+);
 
-    // Function to handle profile search and filter
-    const filteredProfiles = profiles.filter((profile) => {
-        const matchesSearch =
-        profile.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        profile.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = filter === 'All' || profile.status === filter;
-        return matchesSearch && matchesFilter;
-    });
+declare global {
+    interface Window {
+        google: any;
+    }
+}
+
+export default function Dashboard(): JSX.Element {
+    const [profiles, setProfiles] = useState([
+        {
+        name: 'John Doe',
+        title: 'Software Engineer',
+        progress: 75,
+        status: 'In Progress',
+        joinDate: 'December 2021',
+        avatarUrl: '/placeholder.svg?height=48&width=48',
+        },
+        {
+        name: 'Jane Smith',
+        title: 'Project Manager',
+        progress: 100,
+        status: 'Completed',
+        joinDate: 'November 2021',
+        avatarUrl: '/placeholder.svg?height=48&width=48',
+        },
+        // Add more profiles as needed
+    ]);
+
+    const [filter, setFilter] = useState<string>('All');
+    const [filterOpen, setFilterOpen] = useState<boolean>(false);
+
+    const filteredProfiles =
+        filter === 'All'
+        ? profiles
+        : profiles.filter((profile) => profile.status === filter);
+
+    const mapRef = useRef<HTMLDivElement>(null);
+
+    const initMap = () => {
+        if (mapRef.current && window.google) {
+        const map = new window.google.maps.Map(mapRef.current, {
+            center: { lat: -33.866, lng: 151.196 },
+            zoom: 15,
+        });
+
+        const request = {
+            placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
+            fields: ['name', 'formatted_address', 'place_id', 'geometry'],
+        };
+
+        const infowindow = new window.google.maps.InfoWindow();
+        const service = new window.google.maps.places.PlacesService(map);
+
+        service.getDetails(request, (place: any, status: any) => {
+            if (
+            status === window.google.maps.places.PlacesServiceStatus.OK &&
+            place &&
+            place.geometry &&
+            place.geometry.location
+            ) {
+            const marker = new window.google.maps.Marker({
+                map,
+                position: place.geometry.location,
+            });
+
+            window.google.maps.event.addListener(marker, 'click', () => {
+                const content = document.createElement('div');
+                const nameElement = document.createElement('h2');
+
+                nameElement.textContent = place.name;
+                content.appendChild(nameElement);
+
+                const placeIdElement = document.createElement('p');
+                placeIdElement.textContent = `Place ID: ${place.place_id}`;
+                content.appendChild(placeIdElement);
+
+                const placeAddressElement = document.createElement('p');
+                placeAddressElement.textContent = place.formatted_address;
+                content.appendChild(placeAddressElement);
+
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+            });
+            }
+        });
+        }
+    };
+
+    // Optional: Close dropdown when clicking outside
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target as Node)
+        ) {
+            setFilterOpen(false);
+        }
+        };
+
+        if (filterOpen) {
+        document.addEventListener('mousedown', handleClickOutside);
+        } else {
+        document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [filterOpen]);
 
     return (
-        <div className="flex flex-col h-screen">
-        {/* Header, Search, and Filter */}
-        <h2 className="text-4xl font-bold text-[#9687EC] mb-6">Profiles</h2>
-        <div className="flex justify-between mb-6 relative">
-            <div className="relative flex-1 mr-4">
-            <input
-                type="text"
-                placeholder="Search by name, category"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-md bg-[#BDB3F2]-100 focus:outline-none focus:ring-2 focus:ring-[#9687EC]"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+        <>
+        <Script
+            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+            strategy="afterInteractive"
+            onLoad={initMap}
+        />
+
+
+        <div className="flex h-screen">
+            <main className="flex-1 flex">
+            <div className="flex-1 mr-4">
+                <div
+                ref={mapRef}
+                className="w-full h-full rounded-lg"
+                style={{ minHeight: '350px' }}
+                />
             </div>
-
-            {/* Filter Dropdown */}
-            <div className="relative">
-            <button
-                className="flex items-center space-x-2 bg-gray-800 text-white px-4 py-2 rounded-md"
-                onClick={() => setFilterOpen(!filterOpen)}
-            >
-                <span>Filter: {filter === 'All' ? 'None' : filter}</span>
-                <ChevronDown size={20} />
-            </button>
-
-            {filterOpen && (
-                <div className="absolute top-full mt-2 bg-white shadow-lg rounded-md z-10">
-                <ul className="flex flex-col">
-                    <li
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                        setFilter('All');
-                        setFilterOpen(false); // Close dropdown after selection
-                    }}
+            <div className="w-80">
+                <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#9687EC]">Profiles</h2>
+                <div ref={dropdownRef} className="relative inline-block text-left">
+                    <button
+                    onClick={() => setFilterOpen(!filterOpen)}
+                    className="flex items-center space-x-2 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm"
                     >
-                    All
-                    </li>
-                    <li
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                        setFilter('Completed');
-                        setFilterOpen(false); // Close dropdown after selection
-                    }}
-                    >
-                    Completed
-                    </li>
-                    <li
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                        setFilter('In Progress');
-                        setFilterOpen(false); // Close dropdown after selection
-                    }}
-                    >
-                    In Progress
-                    </li>
-                </ul>
+                    <span>{filter}</span>
+                    <ChevronDown size={16} />
+                    </button>
+                    {filterOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                        <ul className="py-1">
+                        <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                            setFilter('All');
+                            setFilterOpen(false);
+                            }}
+                        >
+                            All
+                        </li>
+                        <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                            setFilter('Completed');
+                            setFilterOpen(false);
+                            }}
+                        >
+                            Completed
+                        </li>
+                        <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                            setFilter('In Progress');
+                            setFilterOpen(false);
+                            }}
+                        >
+                            In Progress
+                        </li>
+                        </ul>
+                    </div>
+                    )}
                 </div>
-            )}
+                </div>
+                <div className="overflow-y-auto h-[calc(100vh-8rem)]">
+                {filteredProfiles.map((profile, index) => (
+                    <ProfileCard key={index} {...profile} />
+                ))}
+                </div>
             </div>
+            </main>
         </div>
-
-        {/* Scrollable Profile Cards */}
-        <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredProfiles.length > 0 ? (
-                filteredProfiles.map((profile, index) => (
-                <ProfileCard key={index} {...profile} />
-                ))
-            ) : (
-                <p className="text-center">No profiles found.</p>
-            )}
-            </div>
-        </div>
-        </div>
+        </>
     );
 }
