@@ -2,7 +2,7 @@ import { getHumeAccessToken } from "@/utils/getHumeAccessToken";
 import dynamic from "next/dynamic";
 
 const Chat = dynamic(() => import("@/components/Chat"), {
-  ssr: false,
+  ssr: false, // make sure that it works for the front end
 });
 
 export default async function Page() {

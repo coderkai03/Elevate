@@ -5,8 +5,8 @@ import { Mic, MicOff, Phone } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toggle } from "./ui/toggle";
 import MicFFT from "./MicFFT";
+import { GoogleGenerativeAI } from "@google/generative-ai"
 import { cn } from "@/utils";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AssistantMessage } from "hume/api/resources/empathicVoice/types/AssistantMessage";
 import { UserMessage } from "hume/api/resources/empathicVoice/types/UserMessage";
 
@@ -23,7 +23,7 @@ export default function Controls({
     <div
       className={
         cn(
-          "fixed bottom-0 left-0 w-full p-4 flex items-center justify-center",
+          "fixed bottom-0 left-0 p-4 flex items-center justify-center",
           "bg-gradient-to-t from-card via-card/90 to-card/0",
         )
       }
@@ -68,7 +68,7 @@ export default function Controls({
               <MicFFT fft={micFft} className={"fill-current"} />
             </div>
 
-            <Button
+            {/* <Button
               className={"flex items-center gap-1"}
               onClick={async () => {
                 disconnect();
@@ -111,7 +111,7 @@ export default function Controls({
                 />
               </span>
               <span>End Call</span>
-            </Button>
+            </Button> */}
           </motion.div>
         ) : null}
       </AnimatePresence>
